@@ -1,7 +1,6 @@
 name = "word-ladder-push"
 main = "src/index.js"
 compatibility_date = "2025-01-01"
-compatibility_flags = ["nodejs_compat"]
 
 # Daily at 15:00 UTC (~8am Pacific / 11am Eastern / 4pm London). Adjust as you like.
 [triggers]
@@ -14,8 +13,7 @@ binding = "SUBSCRIPTIONS"
 id = "28c23949344d4e5583a0a00501b6ae7b"
 
 [vars]
-# For reference only — the worker itself only needs the private key (below).
-# This public key must match what's embedded in ../index.html.
+# Must match the VAPID_PUBLIC_KEY embedded in ../index.html.
 VAPID_PUBLIC_KEY = "BEaJia74IOygxPapPybeSRP2hlIa3ue7sGhsYRt5pF1fX4Tvmolvt7Gkenjz0oq8qmCEMlQj4KJh1AQ5OCsVq4c"
 VAPID_SUBJECT = "mailto:anthonydeganijr@gmail.com"
 ALLOWED_ORIGIN = "https://anthonydeganijr-bot.github.io"
