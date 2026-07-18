@@ -47,7 +47,14 @@
     padding: 32px 16px 64px;
   }
   .wrap { width: 100%; max-width: 480px; }
-  header { text-align: center; margin-bottom: 20px; }
+  header { position: relative; text-align: center; margin-bottom: 20px; }
+  .help-btn {
+    position: absolute; top: 0; right: 0;
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--tile-border); background: var(--panel); color: var(--sub);
+    font-weight: 700; font-size: 14px; padding: 0; cursor: pointer; line-height: 1;
+  }
+  .help-btn:hover { color: var(--ink); border-color: var(--accent); }
   h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.02em; }
   .tagline { color: var(--sub); font-size: 14px; margin: 0; }
   .datebar {
@@ -139,11 +146,26 @@
   .support-link:hover { color: var(--accent); border-color: var(--accent); }
   button.support-link { padding: 0; border-radius: 0; font-weight: 400; font-size: 12px; background: none; }
   .hidden { display: none !important; }
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; z-index: 100;
+  }
+  .modal-panel {
+    background: var(--panel); border-radius: 20px; box-shadow: var(--shadow);
+    padding: 24px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-panel h2 { margin: 0 0 12px; font-size: 22px; text-align: center; }
+  .modal-panel p { color: var(--ink); font-size: 14px; line-height: 1.5; margin: 0 0 14px; }
+  .modal-panel ul { margin: 0 0 14px; padding-left: 20px; font-size: 14px; color: var(--ink); line-height: 1.6; }
+  .example-ladder { display: flex; flex-direction: column; gap: 6px; align-items: center; margin: 0 0 16px; }
+  .modal-foot { color: var(--sub); font-size: 12px; text-align: center; margin: 0 0 16px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
+    <button id="helpBtn" class="help-btn" aria-label="How to play">?</button>
     <h1>🪜 Word Ladder</h1>
     <p class="tagline">Change one letter at a time to climb from START to GOAL.</p>
     <div class="datebar">
@@ -190,6 +212,31 @@
     ·
     <button id="notifyBtn" class="support-link hidden">🔔 Get a daily reminder</button>
   </footer>
+</div>
+
+<div id="howToPlay" class="modal-overlay hidden">
+  <div class="modal-panel">
+    <h2>🪜 How to Play</h2>
+    <p>Change one letter at a time to turn the <strong>START</strong> word into the <strong>GOAL</strong> word.</p>
+    <div class="example-ladder">
+      <div class="rung">
+        <div class="tile start">r</div><div class="tile start">e</div><div class="tile start">a</div><div class="tile start">d</div>
+      </div>
+      <div class="rung">
+        <div class="tile">r</div><div class="tile">e</div><div class="tile">a</div><div class="tile changed">l</div>
+      </div>
+      <div class="rung">
+        <div class="tile win">s</div><div class="tile win">e</div><div class="tile win">a</div><div class="tile win">l</div>
+      </div>
+    </div>
+    <ul>
+      <li>Every word along the way must be a real word.</li>
+      <li>You can't reuse a word you've already used.</li>
+      <li>💡 Stuck? Use a hint — you get 3 per puzzle.</li>
+    </ul>
+    <p class="modal-foot">One shared daily puzzle for everyone · unlimited random puzzles anytime.</p>
+    <button class="btn-primary" id="howToPlayCloseBtn" style="width:100%">Let's play!</button>
+  </div>
 </div>
 
 <script>
@@ -324,6 +371,9 @@
     shareBtn: document.getElementById("shareBtn"),
     randomBtn: document.getElementById("randomBtn"),
     notifyBtn: document.getElementById("notifyBtn"),
+    helpBtn: document.getElementById("helpBtn"),
+    howToPlay: document.getElementById("howToPlay"),
+    howToPlayCloseBtn: document.getElementById("howToPlayCloseBtn"),
   };
 
   function makeTile(letter, cls) {
@@ -559,6 +609,16 @@
     els.notifyBtn.textContent = subscribed ? "🔕 Turn off daily reminder" : "🔔 Get a daily reminder";
   }
 
+  // ---------- How to play ----------
+  function showHowToPlay() {
+    els.howToPlay.classList.remove("hidden");
+  }
+
+  function hideHowToPlay() {
+    els.howToPlay.classList.add("hidden");
+    localStorage.setItem("wordladder:seenHowToPlay", "1");
+  }
+
   // ---------- Wire up ----------
   els.submitBtn.addEventListener("click", submitWord);
   els.input.addEventListener("keydown", e => { if (e.key === "Enter") submitWord(); });
@@ -566,6 +626,8 @@
   els.hintBtn.addEventListener("click", giveHint);
   els.resetBtn.addEventListener("click", () => startPuzzle(puzzle, mode, { fresh: true }));
   els.randomBtn.addEventListener("click", () => startPuzzle(randomPuzzle(), "random"));
+  els.helpBtn.addEventListener("click", showHowToPlay);
+  els.howToPlayCloseBtn.addEventListener("click", hideHowToPlay);
   els.shareBtn.addEventListener("click", async () => {
     const text = els.shareText.textContent;
     try {
@@ -582,6 +644,9 @@
   updateStreakDisplay();
   startPuzzle(dailyPuzzle(), "daily");
   initNotifyButton();
+  if (!localStorage.getItem("wordladder:seenHowToPlay")) {
+    showHowToPlay();
+  }
 })();
 </script>
 </body>
