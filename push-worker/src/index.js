@@ -1,4 +1,4 @@
-import { buildPushHTTPRequest } from "@pushforge/builder";
+import { sendWebPush } from "./webpush.js";
 
 function corsHeaders(env) {
   return {
@@ -43,7 +43,7 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    const privateJWK = JSON.parse(env.VAPID_PRIVATE_KEY);
+    const vapidPrivateJwk = JSON.parse(env.VAPID_PRIVATE_KEY);
 
     const list = await env.SUBSCRIPTIONS.list();
     console.log(`scheduled: ${list.keys.length} subscription(s) found`);
@@ -52,18 +52,16 @@ export default {
       if (!raw) continue;
       const subscription = JSON.parse(raw);
       try {
-        const { endpoint, headers, body } = await buildPushHTTPRequest({
-          privateJWK,
+        const res = await sendWebPush({
           subscription,
-          message: {
-            payload: {
-              title: "Word Ladder",
-              body: "Today's puzzle is ready — come climb the ladder!",
-            },
-            adminContact: env.VAPID_SUBJECT,
+          payload: {
+            title: "Word Ladder",
+            body: "Today's puzzle is ready — come climb the ladder!",
           },
+          vapidPrivateJwk,
+          vapidPublicKey: env.VAPID_PUBLIC_KEY,
+          subject: env.VAPID_SUBJECT,
         });
-        const res = await fetch(endpoint, { method: "POST", headers, body });
         console.log(`sent to ${name}: status ${res.status}`);
         if (res.status === 404 || res.status === 410) {
           await env.SUBSCRIPTIONS.delete(name);
