@@ -14,9 +14,11 @@ binding = "SUBSCRIPTIONS"
 id = "28c23949344d4e5583a0a00501b6ae7b"
 
 [vars]
-VAPID_PUBLIC_KEY = "BDEJh8IIQsNzyDT4hca_3B-jcILA9hYfs53x0mf63a_xQS3yj87dB_pmN0CqSShiZ8-Nv4ITMAkAp5xW0Y3IlKM"
+# For reference only — the worker itself only needs the private key (below).
+# This public key must match what's embedded in ../index.html.
+VAPID_PUBLIC_KEY = "BEaJia74IOygxPapPybeSRP2hlIa3ue7sGhsYRt5pF1fX4Tvmolvt7Gkenjz0oq8qmCEMlQj4KJh1AQ5OCsVq4c"
 VAPID_SUBJECT = "mailto:anthonydeganijr@gmail.com"
 ALLOWED_ORIGIN = "https://anthonydeganijr-bot.github.io"
 
-# VAPID_PRIVATE_KEY is a secret, not a var — set it with:
+# VAPID_PRIVATE_KEY is a secret (JWK JSON string), not a var — set it with:
 # wrangler secret put VAPID_PRIVATE_KEY
