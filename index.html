@@ -132,6 +132,11 @@
     font-family: ui-monospace, monospace;
   }
   footer { text-align: center; margin-top: 20px; color: var(--sub); font-size: 12px; }
+  .support-link {
+    display: inline-block; margin-top: 8px; color: var(--sub);
+    text-decoration: none; border-bottom: 1px dotted var(--tile-border);
+  }
+  .support-link:hover { color: var(--accent); border-color: var(--accent); }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -177,7 +182,11 @@
     </div>
   </div>
 
-  <footer>One daily puzzle for everyone · unlimited random puzzles anytime</footer>
+  <footer>
+    One daily puzzle for everyone · unlimited random puzzles anytime
+    <br>
+    <a class="support-link" href="https://buymeacoffee.com/anthonydegani" target="_blank" rel="noopener">☕ Support this game</a>
+  </footer>
 </div>
 
 <script>
