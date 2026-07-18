@@ -381,7 +381,8 @@
     updateStreakDisplay();
   }
 
-  function startPuzzle(p, m) {
+  function startPuzzle(p, m, opts) {
+    const fresh = !!(opts && opts.fresh);
     puzzle = p;
     mode = m;
     chain = [puzzle.start];
@@ -395,7 +396,9 @@
     renderTarget();
     renderLadder();
 
-    if (mode === "daily") {
+    if (mode === "daily" && fresh) {
+      persistDailyProgress();
+    } else if (mode === "daily") {
       const saved = loadState(puzzle.key);
       if (saved && saved.solved) {
         chain = saved.chain;
@@ -475,9 +478,13 @@
     if (hintsLeft <= 0) return;
     const last = chain[chain.length - 1];
     const dist = bfsDistances(puzzle.target);
-    if (!dist.has(last)) return;
+    if (!dist.has(last)) {
+      return setMsg("No hint available — this word can't reach the goal.", "bad");
+    }
     const options = ADJ.get(last).filter(n => dist.has(n) && dist.get(n) === dist.get(last) - 1 && !chain.includes(n));
-    if (!options.length) return;
+    if (!options.length) {
+      return setMsg("No hint available — the way forward goes through a word you've already used.", "bad");
+    }
     hintsLeft--;
     els.hintsLeftEl.textContent = hintsLeft;
     els.hintBtn.disabled = hintsLeft <= 0;
@@ -489,7 +496,7 @@
   els.input.addEventListener("keydown", e => { if (e.key === "Enter") submitWord(); });
   els.input.addEventListener("input", () => els.input.classList.remove("shake"));
   els.hintBtn.addEventListener("click", giveHint);
-  els.resetBtn.addEventListener("click", () => startPuzzle(puzzle, mode));
+  els.resetBtn.addEventListener("click", () => startPuzzle(puzzle, mode, { fresh: true }));
   els.randomBtn.addEventListener("click", () => startPuzzle(randomPuzzle(), "random"));
   els.shareBtn.addEventListener("click", async () => {
     const text = els.shareText.textContent;
