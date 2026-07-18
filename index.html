@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Ladder</title>
+<style>
+  :root {
+    --bg: #f4f3ef;
+    --panel: #ffffff;
+    --ink: #1c1c1e;
+    --sub: #6b6b70;
+    --accent: #4b6cff;
+    --accent-ink: #ffffff;
+    --tile-border: #d3d1cb;
+    --tile-changed: #ffd166;
+    --tile-target: #eef0ff;
+    --good: #3aa76d;
+    --bad: #e0554a;
+    --shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16171b;
+      --panel: #212228;
+      --ink: #f2f2f4;
+      --sub: #9a9aa2;
+      --accent: #7b93ff;
+      --accent-ink: #10111a;
+      --tile-border: #3a3b42;
+      --tile-changed: #caa23a;
+      --tile-target: #2a2c3c;
+      --good: #4fc98a;
+      --bad: #ef6d63;
+      --shadow: 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px 64px;
+  }
+  .wrap { width: 100%; max-width: 480px; }
+  header { text-align: center; margin-bottom: 20px; }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .tagline { color: var(--sub); font-size: 14px; margin: 0; }
+  .datebar {
+    display: flex; justify-content: center; gap: 8px; align-items: center;
+    margin-top: 10px; font-size: 13px; color: var(--sub);
+  }
+  .streak {
+    background: var(--panel); border: 1px solid var(--tile-border);
+    border-radius: 999px; padding: 4px 12px; box-shadow: var(--shadow);
+  }
+  .panel {
+    background: var(--panel);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-top: 18px;
+  }
+  .goal-row {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px dashed var(--tile-border);
+  }
+  .goal-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--sub); }
+  .ladder {
+    display: flex; flex-direction: column-reverse; gap: 8px;
+    min-height: 60px;
+  }
+  .rung { display: flex; justify-content: center; gap: 6px; animation: pop 0.25s ease; }
+  @keyframes pop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .tile {
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--tile-border);
+    border-radius: 10px;
+    font-weight: 700; font-size: 18px;
+    text-transform: uppercase;
+    background: transparent;
+  }
+  .tile.changed { border-color: var(--tile-changed); background: color-mix(in srgb, var(--tile-changed) 25%, transparent); }
+  .tile.start { border-color: var(--accent); }
+  .tile.target { border-color: var(--tile-border); background: var(--tile-target); color: var(--sub); }
+  .tile.win { border-color: var(--good); background: color-mix(in srgb, var(--good) 25%, transparent); }
+  .input-row { display: flex; gap: 8px; margin-top: 18px; }
+  input[type=text] {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 2px solid var(--tile-border);
+    background: transparent;
+    color: var(--ink);
+    font-size: 16px;
+    text-transform: lowercase;
+    outline: none;
+  }
+  input[type=text]:focus { border-color: var(--accent); }
+  input.shake { animation: shake 0.3s ease; border-color: var(--bad); }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  button {
+    border: none; border-radius: 12px; font-weight: 600; cursor: pointer;
+    font-size: 14px; padding: 12px 16px;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .toolbar { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-ghost {
+    background: transparent; color: var(--sub); border: 1px solid var(--tile-border);
+    flex: 1;
+  }
+  .btn-ghost:hover { color: var(--ink); border-color: var(--accent); }
+  .msg { min-height: 20px; text-align: center; font-size: 13px; margin-top: 10px; color: var(--sub); }
+  .msg.bad { color: var(--bad); }
+  .msg.good { color: var(--good); font-weight: 600; }
+  .win-panel { text-align: center; margin-top: 8px; }
+  .win-panel h2 { margin: 4px 0; font-size: 22px; }
+  .win-panel p { color: var(--sub); font-size: 14px; margin: 4px 0 14px; }
+  .share-box {
+    background: var(--tile-target); border-radius: 12px; padding: 12px;
+    font-size: 13px; white-space: pre-wrap; text-align: left; margin-bottom: 12px;
+    font-family: ui-monospace, monospace;
+  }
+  footer { text-align: center; margin-top: 20px; color: var(--sub); font-size: 12px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🪜 Word Ladder</h1>
+    <p class="tagline">Change one letter at a time to climb from START to GOAL.</p>
+    <div class="datebar">
+      <span id="todayLabel"></span>
+      <span class="streak">🔥 <span id="streakCount">0</span> day streak</span>
+    </div>
+  </header>
+
+  <div class="panel">
+    <div class="goal-row">
+      <span class="goal-label">Goal</span>
+      <div id="targetTiles" class="rung"></div>
+    </div>
+
+    <div id="ladder" class="ladder"></div>
+
+    <div id="playArea">
+      <div class="input-row">
+        <input id="wordInput" type="text" maxlength="8" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type your next word…">
+        <button class="btn-primary" id="submitBtn">Go</button>
+      </div>
+      <div id="msg" class="msg"></div>
+      <div class="toolbar">
+        <button class="btn-ghost" id="hintBtn">💡 Hint (<span id="hintsLeft">3</span>)</button>
+        <button class="btn-ghost" id="resetBtn">↺ Restart</button>
+      </div>
+    </div>
+
+    <div id="winPanel" class="win-panel hidden">
+      <h2>🎉 Solved!</h2>
+      <p id="winSummary"></p>
+      <div class="share-box" id="shareText"></div>
+      <div class="toolbar">
+        <button class="btn-primary" id="shareBtn" style="flex:1">📋 Copy Result</button>
+        <button class="btn-ghost" id="randomBtn">🎲 New Puzzle</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>One daily puzzle for everyone · unlimited random puzzles anytime</footer>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // ---------- Word list ----------
+  const RAW_WORDS = ["able","acid","aged","also","area","army","away","back","ball","band","bank","base","bath","bead","beam","bean","bear","beat","been","beer","bell","belt","bend","best","bike","bill","bird","bite","blue","boat","body","bold","bolt","bone","book","boot","born","boss","both","bowl","bulk","bull","burn","bush","busy","cake","call","calm","came","camp","cane","cape","card","care","cart","case","cash","cast","cave","cell","chat","chip","city","club","coal","coat","code","cold","come","cook","cool","cope","copy","cord","core","corn","cost","cozy","crew","crop","dark","dash","data","date","dawn","days","dead","deal","dear","debt","deck","deed","deep","deer","deny","desk","dial","dice","diet","dime","dirt","dish","disk","dive","does","done","doom","door","dose","down","drag","draw","drew","drop","drug","drum","dual","duck","dude","duke","dull","dump","dust","duty","each","earn","ease","east","easy","edge","else","ends","envy","epic","even","ever","evil","exam","exit","face","fact","fade","fail","fair","fake","fall","fame","farm","fast","fate","feat","feed","feel","fees","feet","fell","felt","file","fill","film","find","fine","fire","firm","fish","five","flag","flat","flew","flow","foam","foil","fold","folk","fond","food","fool","foot","ford","form","fort","foul","four","fowl","free","from","fuel","full","fund","fuse","gain","gale","game","gang","gate","gave","gaze","gear","gene","gift","girl","give","glad","glow","glue","goal","goat","goes","gold","golf","gone","good","gray","grew","grey","grid","grim","grip","grow","gulf","gull","hair","half","hall","halt","hand","hang","hard","harm","hate","have","hawk","haze","head","heal","heap","hear","heat","heel","held","hell","helm","help","herb","herd","here","hero","hide","high","hike","hill","hint","hire","hive","hold","hole","holy","home","hood","hook","hope","horn","host","hour","huge","hull","hunt","hurt","hymn","icon","idea","idle","inch","into","iron","item","jail","jazz","jean","join","joke","jump","junk","jury","just","keen","keep","kept","kick","kill","kind","king","kiss","kite","knee","knew","know","lace","lack","lady","lake","lamb","lamp","land","lane","last","late","lawn","lazy","lead","leaf","lean","leap","left","lend","lens","less","lest","life","lift","like","lime","limp","line","link","lion","list","live","load","loaf","loan","lock","lone","long","look","loop","lord","lose","loss","lost","loud","love","luck","lump","lung","made","mail","main","make","male","mall","many","mark","mask","mass","mast","mate","math","maze","meal","mean","meat","meet","melt","mend","menu","mere","mesh","mess","mice","mild","mile","milk","mill","mind","mine","mint","miss","mist","mode","mold","mole","monk","mood","moon","more","moss","most","moth","move","much","mule","must","mute","myth","nail","name","navy","near","neat","neck","need","nest","news","next","nice","nine","node","none","noon","norm","nose","note","noun","oath","oval","oven","over","pace","pack","page","paid","pain","pair","pale","palm","park","part","pass","past","path","pave","peak","pear","peel","peer","pest","pick","pier","pile","pill","pine","pink","pipe","pity","plan","play","plot","plow","plug","plus","poem","poet","pole","poll","pond","pool","poor","pope","pork","port","pose","post","pour","pray","prep","prey","pull","pulp","pump","punk","pure","push","quiz","race","rack","rage","raid","rail","rain","rank","rare","rate","rave","read","real","reap","rear","redo","reef","reel","rely","rent","rest","rice","rich","ride","rise","risk","road","roar","robe","rock","rode","role","roll","roof","room","root","rope","rose","rosy","rude","rule","rush","rust","safe","sail","sake","sale","salt","same","sand","sane","save","scan","seal","seat","seed","seek","seem","seen","self","sell","send","sent","ship","shoe","shop","shot","show","shut","sick","side","sigh","sign","silk","sing","sink","site","size","skew","skin","skip","slam","slap","slid","slim","slip","slot","slow","snap","snow","soak","soap","sock","soda","sofa","soft","soil","sold","sole","some","song","soon","sore","sort","soul","soup","sour","spin","spit","spot","spun","spur","star","stay","stem","step","stew","stir","stop","sure","surf","swam","swan","swap","swim","tack","tail","take","tale","talk","tall","tame","tank","tape","task","teal","team","tear","teen","tell","tend","tent","term","test","text","than","that","thaw","them","then","they","thin","this","thus","tick","tide","tidy","tile","till","tilt","time","tiny","tire","toad","told","toll","tomb","tone","tons","tool","tore","torn","toss","tour","town","trap","tray","tree","trek","trim","trip","true","tuba","tube","tuck","tuna","tune","turf","turn","twin","type","ugly","unit","upon","urge","used","user","vain","vane","vast","veil","vein","verb","vest","veto","vice","view","vine","visa","void","vote","wade","wage","wait","wake","walk","wall","want","ward","warm","warn","wars","wash","wasp","wave","weak","wear","weed","week","well","west","what","when","whip","whom","wide","wife","wild","will","wind","wine","wing","wink","wipe","wire","wise","wish","with","wolf","wood","wool","word","wore","work","worm","worn","wrap","yard","yarn","year","yell","zero","zone","zoom"];
+
+  const WORDS = [...new Set(RAW_WORDS.filter(w => w.length === 4))];
+  const WORD_SET = new Set(WORDS);
+
+  // ---------- Graph ----------
+  function neighbors(word) {
+    const result = [];
+    for (let i = 0; i < word.length; i++) {
+      for (let c = 97; c <= 122; c++) {
+        const ch = String.fromCharCode(c);
+        if (ch === word[i]) continue;
+        const cand = word.slice(0, i) + ch + word.slice(i + 1);
+        if (WORD_SET.has(cand)) result.push(cand);
+      }
+    }
+    return result;
+  }
+
+  const ADJ = new Map();
+  for (const w of WORDS) ADJ.set(w, neighbors(w));
+
+  function bfsDistances(start) {
+    const dist = new Map([[start, 0]]);
+    const queue = [start];
+    while (queue.length) {
+      const cur = queue.shift();
+      for (const n of ADJ.get(cur)) {
+        if (!dist.has(n)) {
+          dist.set(n, dist.get(cur) + 1);
+          queue.push(n);
+        }
+      }
+    }
+    return dist;
+  }
+
+  function shortestPathLength(a, b) {
+    const dist = bfsDistances(a);
+    return dist.has(b) ? dist.get(b) : null;
+  }
+
+  // largest connected component (guarantees solvable puzzles)
+  function largestComponent() {
+    const seen = new Set();
+    let best = [];
+    for (const w of WORDS) {
+      if (seen.has(w)) continue;
+      const dist = bfsDistances(w);
+      for (const k of dist.keys()) seen.add(k);
+      if (dist.size > best.length) best = [...dist.keys()];
+    }
+    return best.sort();
+  }
+  const COMPONENT = largestComponent();
+
+  // ---------- Seeded random ----------
+  function mulberry32(seed) {
+    return function() {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function hashString(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) { h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
+    return h;
+  }
+
+  function pickPuzzle(rng, minDist, maxDist) {
+    const start = COMPONENT[Math.floor(rng() * COMPONENT.length)];
+    const dist = bfsDistances(start);
+    let candidates = [...dist.entries()].filter(([w, d]) => d >= minDist && d <= maxDist).map(([w]) => w);
+    if (!candidates.length) {
+      // widen until something is found
+      let lo = minDist, hi = maxDist;
+      while (!candidates.length && (lo > 1 || hi < 10)) {
+        lo = Math.max(1, lo - 1); hi = Math.min(10, hi + 1);
+        candidates = [...dist.entries()].filter(([w, d]) => d >= lo && d <= hi).map(([w]) => w);
+      }
+    }
+    const target = candidates[Math.floor(rng() * candidates.length)];
+    return { start, target, optimal: dist.get(target) };
+  }
+
+  function todayKey() {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function dailyPuzzle() {
+    const key = todayKey();
+    const rng = mulberry32(hashString("word-ladder-" + key));
+    return { ...pickPuzzle(rng, 4, 7), key };
+  }
+
+  function randomPuzzle() {
+    const rng = mulberry32((Math.random() * 1e9) | 0);
+    return { ...pickPuzzle(rng, 4, 7), key: "random-" + Date.now() };
+  }
+
+  // ---------- Game state ----------
+  let puzzle = null;
+  let chain = [];
+  let hintsLeft = 3;
+  let mode = "daily";
+
+  const els = {
+    todayLabel: document.getElementById("todayLabel"),
+    streakCount: document.getElementById("streakCount"),
+    targetTiles: document.getElementById("targetTiles"),
+    ladder: document.getElementById("ladder"),
+    playArea: document.getElementById("playArea"),
+    input: document.getElementById("wordInput"),
+    submitBtn: document.getElementById("submitBtn"),
+    msg: document.getElementById("msg"),
+    hintBtn: document.getElementById("hintBtn"),
+    hintsLeftEl: document.getElementById("hintsLeft"),
+    resetBtn: document.getElementById("resetBtn"),
+    winPanel: document.getElementById("winPanel"),
+    winSummary: document.getElementById("winSummary"),
+    shareText: document.getElementById("shareText"),
+    shareBtn: document.getElementById("shareBtn"),
+    randomBtn: document.getElementById("randomBtn"),
+  };
+
+  function makeTile(letter, cls) {
+    const div = document.createElement("div");
+    div.className = "tile" + (cls ? " " + cls : "");
+    div.textContent = letter;
+    return div;
+  }
+
+  function diffIndex(a, b) {
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return i;
+    return -1;
+  }
+
+  function renderTarget() {
+    els.targetTiles.innerHTML = "";
+    const solved = chain[chain.length - 1] === puzzle.target;
+    for (const ch of puzzle.target) {
+      els.targetTiles.appendChild(makeTile(ch, solved ? "win" : "target"));
+    }
+  }
+
+  function renderLadder() {
+    els.ladder.innerHTML = "";
+    chain.forEach((word, idx) => {
+      const rung = document.createElement("div");
+      rung.className = "rung";
+      const prev = idx > 0 ? chain[idx - 1] : null;
+      const changed = prev ? diffIndex(prev, word) : -1;
+      const isWin = word === puzzle.target;
+      [...word].forEach((letter, i) => {
+        let cls = idx === 0 ? "start" : (i === changed ? "changed" : "");
+        if (isWin) cls = "win";
+        rung.appendChild(makeTile(letter, cls));
+      });
+      els.ladder.appendChild(rung);
+    });
+  }
+
+  function setMsg(text, type) {
+    els.msg.textContent = text || "";
+    els.msg.className = "msg" + (type ? " " + type : "");
+  }
+
+  function loadState(key) {
+    try { return JSON.parse(localStorage.getItem("wordladder:" + key) || "null"); }
+    catch { return null; }
+  }
+  function saveState(key, data) {
+    localStorage.setItem("wordladder:" + key, JSON.stringify(data));
+  }
+
+  function updateStreakDisplay() {
+    const streak = parseInt(localStorage.getItem("wordladder:streak") || "0", 10);
+    els.streakCount.textContent = streak;
+  }
+
+  function bumpStreakOnWin() {
+    const key = todayKey();
+    const lastWin = localStorage.getItem("wordladder:lastWinDate");
+    if (lastWin === key) return; // already counted today
+    const yesterday = new Date(Date.now() - 86400000);
+    const yKey = yesterday.getFullYear() + "-" + String(yesterday.getMonth() + 1).padStart(2, "0") + "-" + String(yesterday.getDate()).padStart(2, "0");
+    let streak = parseInt(localStorage.getItem("wordladder:streak") || "0", 10);
+    streak = (lastWin === yKey) ? streak + 1 : 1;
+    localStorage.setItem("wordladder:streak", String(streak));
+    localStorage.setItem("wordladder:lastWinDate", key);
+    updateStreakDisplay();
+  }
+
+  function startPuzzle(p, m) {
+    puzzle = p;
+    mode = m;
+    chain = [puzzle.start];
+    hintsLeft = 3;
+    els.hintsLeftEl.textContent = hintsLeft;
+    els.winPanel.classList.add("hidden");
+    els.playArea.classList.remove("hidden");
+    setMsg("");
+    els.input.value = "";
+    renderTarget();
+    renderLadder();
+
+    if (mode === "daily") {
+      const saved = loadState(puzzle.key);
+      if (saved && saved.solved) {
+        chain = saved.chain;
+        renderTarget();
+        renderLadder();
+        showWin(saved.chain.length - 1, true);
+      } else if (saved && saved.chain) {
+        chain = saved.chain;
+        renderTarget();
+        renderLadder();
+      }
+    }
+  }
+
+  function persistDailyProgress() {
+    if (mode !== "daily") return;
+    saveState(puzzle.key, { chain, solved: chain[chain.length - 1] === puzzle.target });
+  }
+
+  function showWin(moves, alreadySolved) {
+    els.playArea.classList.add("hidden");
+    els.winPanel.classList.remove("hidden");
+    const extra = moves - puzzle.optimal;
+    els.winSummary.textContent = `${moves} move${moves === 1 ? "" : "s"} · optimal was ${puzzle.optimal}` + (extra > 0 ? ` (+${extra})` : " — perfect!");
+    const rungIcons = chain.slice(1).map((_, i) => (i < puzzle.optimal ? "🟩" : "🟨")).join("") || "✅";
+    const label = mode === "daily" ? `Word Ladder ${puzzle.key}` : "Word Ladder (random)";
+    els.shareText.textContent = `${label}\n${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}\n${moves}/${puzzle.optimal} moves ${rungIcons}`;
+    if (!alreadySolved) bumpStreakOnWin();
+  }
+
+  function submitWord() {
+    const raw = els.input.value.trim().toLowerCase();
+    if (!raw) return;
+    const last = chain[chain.length - 1];
+
+    if (raw.length !== last.length) {
+      return fail(`Word must be ${last.length} letters.`);
+    }
+    if (!WORD_SET.has(raw)) {
+      return fail("Not in our word list.");
+    }
+    if (diffCount(raw, last) !== 1) {
+      return fail("Change exactly one letter from the last word.");
+    }
+    if (chain.includes(raw)) {
+      return fail("You already used that word.");
+    }
+
+    chain.push(raw);
+    els.input.value = "";
+    renderLadder();
+    persistDailyProgress();
+
+    if (raw === puzzle.target) {
+      renderTarget();
+      setMsg("Solved!", "good");
+      showWin(chain.length - 1, false);
+    } else {
+      setMsg("Nice — keep climbing!", "good");
+    }
+  }
+
+  function diffCount(a, b) {
+    let c = 0;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) c++;
+    return c;
+  }
+
+  function fail(text) {
+    setMsg(text, "bad");
+    els.input.classList.remove("shake");
+    void els.input.offsetWidth;
+    els.input.classList.add("shake");
+  }
+
+  function giveHint() {
+    if (hintsLeft <= 0) return;
+    const last = chain[chain.length - 1];
+    const dist = bfsDistances(puzzle.target);
+    if (!dist.has(last)) return;
+    const options = ADJ.get(last).filter(n => dist.has(n) && dist.get(n) === dist.get(last) - 1 && !chain.includes(n));
+    if (!options.length) return;
+    hintsLeft--;
+    els.hintsLeftEl.textContent = hintsLeft;
+    els.hintBtn.disabled = hintsLeft <= 0;
+    setMsg(`Hint: try a word starting with "${options[0][0].toUpperCase()}"`, "");
+  }
+
+  // ---------- Wire up ----------
+  els.submitBtn.addEventListener("click", submitWord);
+  els.input.addEventListener("keydown", e => { if (e.key === "Enter") submitWord(); });
+  els.input.addEventListener("input", () => els.input.classList.remove("shake"));
+  els.hintBtn.addEventListener("click", giveHint);
+  els.resetBtn.addEventListener("click", () => startPuzzle(puzzle, mode));
+  els.randomBtn.addEventListener("click", () => startPuzzle(randomPuzzle(), "random"));
+  els.shareBtn.addEventListener("click", async () => {
+    const text = els.shareText.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      els.shareBtn.textContent = "✅ Copied!";
+      setTimeout(() => els.shareBtn.textContent = "📋 Copy Result", 1500);
+    } catch {
+      alert(text);
+    }
+  });
+
+  // ---------- Init ----------
+  els.todayLabel.textContent = new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+  updateStreakDisplay();
+  startPuzzle(dailyPuzzle(), "daily");
+})();
+</script>
+</body>
+</html>
