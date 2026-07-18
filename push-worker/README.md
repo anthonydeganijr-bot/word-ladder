@@ -27,10 +27,13 @@ user accounts — just a subscription tied to whichever browser clicked
    ```
    npx wrangler secret put VAPID_PRIVATE_KEY
    ```
-   When prompted, paste: `P3Iiv1SK-uPiWzxHfUHniNvSG2HpwBEkoeeeVcWOHXA`
+   When prompted, paste the full JSON on one line:
+   `{"alg":"ES256","key_ops":["sign"],"ext":true,"kty":"EC","x":"RomJrvgg7KDE9qk_Jt5JE_aGUhre57uwaGxhG3mkXV8","y":"X4Tvmolvt7Gkenjz0oq8qmCEMlQj4KJh1AQ5OCsVq4c","crv":"P-256","d":"B-yAi-pAcLTDSYO1Arr6hfQyZjssSGGM8MO_WgWD2cg"}`
 
    (The matching public key is already in `wrangler.toml` and in the
-   game's `index.html` — it's not secret, only the private key is.)
+   game's `index.html` — it's not secret, only the private key is. This
+   uses `@pushforge/builder`, which needs the private key in JWK format —
+   generate a fresh pair anytime with `npx @pushforge/builder vapid`.)
 6. Deploy:
    ```
    npx wrangler deploy

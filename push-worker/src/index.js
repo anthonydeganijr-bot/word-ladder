@@ -1,4 +1,4 @@
-import webpush from "web-push";
+import { buildPushHTTPRequest } from "@pushforge/builder";
 
 function corsHeaders(env) {
   return {
@@ -43,24 +43,33 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    webpush.setVapidDetails(env.VAPID_SUBJECT, env.VAPID_PUBLIC_KEY, env.VAPID_PRIVATE_KEY);
-
-    const payload = JSON.stringify({
-      title: "Word Ladder",
-      body: "Today's puzzle is ready — come climb the ladder!",
-    });
+    const privateJWK = JSON.parse(env.VAPID_PRIVATE_KEY);
 
     const list = await env.SUBSCRIPTIONS.list();
+    console.log(`scheduled: ${list.keys.length} subscription(s) found`);
     for (const { name } of list.keys) {
       const raw = await env.SUBSCRIPTIONS.get(name);
       if (!raw) continue;
       const subscription = JSON.parse(raw);
       try {
-        await webpush.sendNotification(subscription, payload);
-      } catch (err) {
-        if (err.statusCode === 404 || err.statusCode === 410) {
+        const { endpoint, headers, body } = await buildPushHTTPRequest({
+          privateJWK,
+          subscription,
+          message: {
+            payload: {
+              title: "Word Ladder",
+              body: "Today's puzzle is ready — come climb the ladder!",
+            },
+            adminContact: env.VAPID_SUBJECT,
+          },
+        });
+        const res = await fetch(endpoint, { method: "POST", headers, body });
+        console.log(`sent to ${name}: status ${res.status}`);
+        if (res.status === 404 || res.status === 410) {
           await env.SUBSCRIPTIONS.delete(name);
         }
+      } catch (err) {
+        console.error(`failed to send to ${name}: ${err.message || err}`);
       }
     }
   },
