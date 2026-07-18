@@ -11,7 +11,7 @@ crons = ["0 15 * * *"]
 # then paste the returned id below.
 [[kv_namespaces]]
 binding = "SUBSCRIPTIONS"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "28c23949344d4e5583a0a00501b6ae7b"
 
 [vars]
 VAPID_PUBLIC_KEY = "BDEJh8IIQsNzyDT4hca_3B-jcILA9hYfs53x0mf63a_xQS3yj87dB_pmN0CqSShiZ8-Nv4ITMAkAp5xW0Y3IlKM"
