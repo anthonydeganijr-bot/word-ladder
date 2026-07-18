@@ -1,0 +1,22 @@
+name = "word-ladder-push"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Daily at 15:00 UTC (~8am Pacific / 11am Eastern / 4pm London). Adjust as you like.
+[triggers]
+crons = ["0 15 * * *"]
+
+# Create with: wrangler kv namespace create SUBSCRIPTIONS
+# then paste the returned id below.
+[[kv_namespaces]]
+binding = "SUBSCRIPTIONS"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[vars]
+VAPID_PUBLIC_KEY = "BDEJh8IIQsNzyDT4hca_3B-jcILA9hYfs53x0mf63a_xQS3yj87dB_pmN0CqSShiZ8-Nv4ITMAkAp5xW0Y3IlKM"
+VAPID_SUBJECT = "mailto:anthonydeganijr@gmail.com"
+ALLOWED_ORIGIN = "https://anthonydeganijr-bot.github.io"
+
+# VAPID_PRIVATE_KEY is a secret, not a var — set it with:
+# wrangler secret put VAPID_PRIVATE_KEY
