@@ -704,6 +704,15 @@
       els.installBannerText.textContent = "📲 Install Word Ladder as an app for the full experience.";
       els.installBtn.classList.remove("hidden");
       els.installBanner.classList.remove("hidden");
+    } else {
+      return;
+    }
+
+    // The banner lives at the top of the page, but this can be triggered from a
+    // button down in the footer -- scroll it into view so it's actually seen
+    // instead of silently appearing off-screen above the current scroll position.
+    if (force) {
+      els.installBanner.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 
