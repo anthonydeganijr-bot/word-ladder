@@ -531,8 +531,11 @@
     const extra = moves - puzzle.optimal;
     els.winSummary.textContent = `${moves} move${moves === 1 ? "" : "s"} · optimal was ${puzzle.optimal}` + (extra > 0 ? ` (+${extra})` : " — perfect!");
     const rungIcons = chain.slice(1).map((_, i) => (i < puzzle.optimal ? "🟩" : "🟨")).join("") || "✅";
-    const label = mode === "daily" ? `Word Ladder ${puzzle.key}` : "Word Ladder (random)";
-    els.shareText.textContent = `${label}\n${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}\n${moves}/${puzzle.optimal} moves ${rungIcons}\nPlay: ${GAME_URL}`;
+    const puzzleLabel = mode === "daily" ? "today's Word Ladder" : "a Word Ladder puzzle";
+    const challenge = extra > 0
+      ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) 🪜 Can you beat me?`
+      : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! 🪜 Think you can match it?`;
+    els.shareText.textContent = `${challenge}\n${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}\n${rungIcons}\n${GAME_URL}`;
     if (!alreadySolved) bumpStreakOnWin();
   }
 
@@ -641,19 +644,29 @@
         return;
       }
 
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") return;
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") return;
 
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-      });
-      await fetch(PUSH_API_BASE + "/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(subscription),
-      }).catch(() => {});
-      setNotifyBtnState(true);
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        });
+        await fetch(PUSH_API_BASE + "/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(subscription),
+        }).catch(() => {});
+        setNotifyBtnState(true);
+      } catch (err) {
+        // Some browsers (notably iOS Safari outside an installed home-screen app)
+        // report Push API support but still refuse to actually subscribe.
+        if (isIOS() && !isStandalone()) {
+          showInstallBanner(true);
+        } else {
+          setMsg("Couldn't enable notifications on this browser.", "bad");
+        }
+      }
     });
   }
 
@@ -725,7 +738,10 @@
 
     if (navigator.share) {
       try {
-        await navigator.share({ text, url: GAME_URL });
+        // Deliberately no separate `url` field — GAME_URL is already embedded in `text`.
+        // Passing both makes many share targets (notably iOS Messages) build a link-preview
+        // card from `url` and drop the custom text entirely.
+        await navigator.share({ text });
         return;
       } catch (err) {
         if (err.name === "AbortError") return; // user closed the share sheet
