@@ -262,6 +262,8 @@
     ·
     <button id="notifyBtn" class="support-link hidden">🔔 Get a daily reminder</button>
     <br>
+    <a class="support-link" href="../">🎮 More Games</a>
+    ·
     <a class="support-link" href="privacy.html">Privacy Policy</a>
   </footer>
 </div>
@@ -296,9 +298,10 @@
     <h2>📲 Get Reminders</h2>
     <p>To get a daily reminder, add Word Ladder to your Home Screen. It only takes two taps:</p>
     <ol class="big-steps">
-      <li>Tap the <strong>Share</strong> button at the bottom of the screen.</li>
-      <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
+      <li id="addToHomeStep1"></li>
+      <li id="addToHomeStep2"></li>
     </ol>
+    <p class="modal-foot hidden" id="addToHomeTip"></p>
     <p class="modal-foot">Then open Word Ladder from your Home Screen icon and tap the reminder button there.</p>
     <button class="btn-primary" id="addToHomeCloseBtn" style="width:100%">Got it</button>
   </div>
@@ -310,12 +313,47 @@
 
   const GAME_URL = "https://anthonydeganijr-bot.github.io/word-ladder/";
 
+  // Daily puzzles are the same for everyone, so the plain URL is enough. Random puzzles
+  // aren't -- without the start/target encoded in the link, a friend who clicks a shared
+  // random-puzzle result just lands on today's daily puzzle instead of the one that was
+  // actually solved, which defeats the "can you beat me?" challenge entirely.
+  function shareUrlFor() {
+    if (mode !== "random") return GAME_URL;
+    return `${GAME_URL}?start=${puzzle.start}&target=${puzzle.target}`;
+  }
+
   function isStandalone() {
     return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   }
 
   function isIOS() {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+
+  // "Add to Home Screen" lives in a different place depending on which browser is
+  // actually running (they're all still Safari's WebKit engine under iOS's hood, but
+  // each wraps its own UI around it) -- generic instructions sent people hunting.
+  function iosAddToHomeInstructions() {
+    if (/CriOS/.test(navigator.userAgent)) {
+      return {
+        step1: 'Tap the <strong>Share</strong> icon (a square with an arrow) in the <strong>top-right</strong> corner.',
+        step2: 'Scroll down and tap <strong>"Add to Home Screen"</strong>.',
+        tip: "",
+      };
+    }
+    if (/FxiOS/.test(navigator.userAgent) || /EdgiOS/.test(navigator.userAgent)) {
+      return {
+        step1: 'Tap the <strong>menu</strong> (•••) or <strong>Share</strong> icon.',
+        step2: 'Look for <strong>"Share..."</strong> then <strong>"Add to Home Screen"</strong>.',
+        tip: "",
+      };
+    }
+    // Safari (the default browser on iOS, and what most people are using)
+    return {
+      step1: 'Tap the <strong>Share</strong> icon (a square with an arrow) at the <strong>bottom</strong> of the screen.',
+      step2: 'Tap <strong>"Add to Home Screen"</strong>.',
+      tip: 'Don\'t see it in the list? Scroll to the very bottom and tap <strong>"Edit Actions..."</strong>, then tap the ➕ next to "Add to Home Screen" — then go back and tap it.',
+    };
   }
 
   // ---------- Word list ----------
@@ -422,6 +460,19 @@
     return { ...pickPuzzle(rng, 4, 7), key: "random-" + Date.now() };
   }
 
+  // Reconstructs a specific shared puzzle from ?start=&target= URL params. Returns null
+  // if the words aren't valid or (very unlikely, but words come from a URL) not connected,
+  // so the caller can silently fall back to the daily puzzle instead of erroring out.
+  function puzzleFromUrl() {
+    const params = new URLSearchParams(location.search);
+    const start = (params.get("start") || "").toLowerCase();
+    const target = (params.get("target") || "").toLowerCase();
+    if (!start || !target || !WORD_SET.has(start) || !WORD_SET.has(target)) return null;
+    const optimal = shortestPathLength(start, target);
+    if (optimal == null) return null;
+    return { start, target, optimal, key: "shared-" + start + "-" + target };
+  }
+
   // ---------- Game state ----------
   let puzzle = null;
   let chain = [];
@@ -459,6 +510,9 @@
     installBannerClose: document.getElementById("installBannerClose"),
     addToHomeModal: document.getElementById("addToHomeModal"),
     addToHomeCloseBtn: document.getElementById("addToHomeCloseBtn"),
+    addToHomeStep1: document.getElementById("addToHomeStep1"),
+    addToHomeStep2: document.getElementById("addToHomeStep2"),
+    addToHomeTip: document.getElementById("addToHomeTip"),
   };
 
   function makeTile(letter, cls) {
@@ -577,11 +631,12 @@
       ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) 🪜 Can you beat me?`
       : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! 🪜 Think you can match it?`;
     const chainLine = `${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}`;
-    currentShareText = `${challenge}\n${chainLine}\n${rungIcons}\n${GAME_URL}`;
+    const shareUrl = shareUrlFor();
+    currentShareText = `${challenge}\n${chainLine}\n${rungIcons}\n${shareUrl}`;
     els.shareChallenge.textContent = challenge;
     els.shareChain.textContent = chainLine;
     els.shareGrid.textContent = rungIcons;
-    els.shareLink.textContent = GAME_URL;
+    els.shareLink.textContent = shareUrl;
     if (!alreadySolved) bumpStreakOnWin();
   }
 
@@ -641,10 +696,24 @@
     if (!options.length) {
       return setMsg("No hint available — the way forward goes through a word you've already used.", "bad");
     }
+    // Reveal the next word directly rather than a "starts with X" clue -- a letter clue
+    // has nowhere to go on a second hint for the same word (same clue every time), and
+    // players got stuck exactly there. This can't repeat since the chain itself advances.
     hintsLeft--;
     els.hintsLeftEl.textContent = hintsLeft;
     els.hintBtn.disabled = hintsLeft <= 0;
-    setMsg(`Hint: try a word starting with "${options[0][0].toUpperCase()}"`, "");
+    const next = options[0];
+    chain.push(next);
+    els.input.value = "";
+    renderLadder();
+    persistDailyProgress();
+    if (next === puzzle.target) {
+      renderTarget();
+      setMsg("Solved!", "good");
+      showWin(chain.length - 1, false);
+    } else {
+      setMsg(`Hint used: added "${next.toUpperCase()}"`, "");
+    }
   }
 
   // ---------- Daily reminder (push notifications) ----------
@@ -770,6 +839,15 @@
   // manual taps, in a modal that appears wherever the user already is (no
   // banner to scroll to, no clicking "Install" that silently can't work).
   function showAddToHomeScreenModal() {
+    const instr = iosAddToHomeInstructions();
+    els.addToHomeStep1.innerHTML = instr.step1;
+    els.addToHomeStep2.innerHTML = instr.step2;
+    if (instr.tip) {
+      els.addToHomeTip.innerHTML = "💡 " + instr.tip;
+      els.addToHomeTip.classList.remove("hidden");
+    } else {
+      els.addToHomeTip.classList.add("hidden");
+    }
     els.addToHomeModal.classList.remove("hidden");
   }
 
@@ -825,7 +903,8 @@
   // ---------- Init ----------
   els.todayLabel.textContent = new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
   updateStreakDisplay();
-  startPuzzle(dailyPuzzle(), "daily");
+  const sharedPuzzle = puzzleFromUrl();
+  startPuzzle(sharedPuzzle || dailyPuzzle(), sharedPuzzle ? "random" : "daily");
   initNotifyButton();
   initInstallBanner();
   if (!localStorage.getItem("wordladder:seenHowToPlay")) {
