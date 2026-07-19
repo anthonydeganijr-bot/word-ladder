@@ -630,28 +630,43 @@
     setNotifyBtnState(!!existing);
 
     els.notifyBtn.addEventListener("click", async () => {
-      const registration = await navigator.serviceWorker.ready;
-      const current = await registration.pushManager.getSubscription();
-
-      if (current) {
-        await fetch(PUSH_API_BASE + "/unsubscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ endpoint: current.endpoint }),
-        }).catch(() => {});
-        await current.unsubscribe();
-        setNotifyBtnState(false);
-        return;
-      }
+      els.notifyBtn.textContent = "…";
+      els.notifyBtn.disabled = true;
 
       try {
-        const permission = await Notification.requestPermission();
-        if (permission !== "granted") return;
+        const registration = await navigator.serviceWorker.ready;
+        const current = await registration.pushManager.getSubscription();
 
-        const subscription = await registration.pushManager.subscribe({
+        if (current) {
+          await fetch(PUSH_API_BASE + "/unsubscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ endpoint: current.endpoint }),
+          }).catch(() => {});
+          await current.unsubscribe();
+          setNotifyBtnState(false);
+          return;
+        }
+
+        // Notification.requestPermission()/pushManager.subscribe() are known to hang
+        // indefinitely rather than reject on some browsers (notably iOS Safari outside
+        // an installed home-screen app) -- race against a timeout so a click always
+        // ends in a visible outcome instead of looking like nothing happened.
+        const withTimeout = (promise, ms) => Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+        ]);
+
+        const permission = await withTimeout(Notification.requestPermission(), 8000);
+        if (permission !== "granted") {
+          if (isIOS() && !isStandalone()) showInstallBanner(true);
+          return;
+        }
+
+        const subscription = await withTimeout(registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-        });
+        }), 8000);
         await fetch(PUSH_API_BASE + "/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -659,13 +674,14 @@
         }).catch(() => {});
         setNotifyBtnState(true);
       } catch (err) {
-        // Some browsers (notably iOS Safari outside an installed home-screen app)
-        // report Push API support but still refuse to actually subscribe.
         if (isIOS() && !isStandalone()) {
           showInstallBanner(true);
         } else {
           setMsg("Couldn't enable notifications on this browser.", "bad");
         }
+        setNotifyBtnState(false);
+      } finally {
+        els.notifyBtn.disabled = false;
       }
     });
   }
