@@ -181,7 +181,8 @@
   }
   .modal-panel h2 { margin: 0 0 12px; font-size: 22px; text-align: center; }
   .modal-panel p { color: var(--ink); font-size: 14px; line-height: 1.5; margin: 0 0 14px; }
-  .modal-panel ul { margin: 0 0 14px; padding-left: 20px; font-size: 14px; color: var(--ink); line-height: 1.6; }
+  .modal-panel ul, .modal-panel ol { margin: 0 0 14px; padding-left: 20px; font-size: 14px; color: var(--ink); line-height: 1.6; }
+  .modal-panel ol.big-steps { font-size: 17px; line-height: 1.8; }
   .example-ladder { display: flex; flex-direction: column; gap: 6px; align-items: center; margin: 0 0 16px; }
   .modal-foot { color: var(--sub); font-size: 12px; text-align: center; margin: 0 0 16px; }
 </style>
@@ -266,6 +267,19 @@
     </ul>
     <p class="modal-foot">One shared daily puzzle for everyone · unlimited random puzzles anytime.</p>
     <button class="btn-primary" id="howToPlayCloseBtn" style="width:100%">Let's play!</button>
+  </div>
+</div>
+
+<div id="addToHomeModal" class="modal-overlay hidden">
+  <div class="modal-panel">
+    <h2>📲 Get Reminders</h2>
+    <p>To get a daily reminder, add Word Ladder to your Home Screen. It only takes two taps:</p>
+    <ol class="big-steps">
+      <li>Tap the <strong>Share</strong> button at the bottom of the screen.</li>
+      <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
+    </ol>
+    <p class="modal-foot">Then open Word Ladder from your Home Screen icon and tap the reminder button there.</p>
+    <button class="btn-primary" id="addToHomeCloseBtn" style="width:100%">Got it</button>
   </div>
 </div>
 
@@ -418,6 +432,8 @@
     installBannerText: document.getElementById("installBannerText"),
     installBtn: document.getElementById("installBtn"),
     installBannerClose: document.getElementById("installBannerClose"),
+    addToHomeModal: document.getElementById("addToHomeModal"),
+    addToHomeCloseBtn: document.getElementById("addToHomeCloseBtn"),
   };
 
   function makeTile(letter, cls) {
@@ -619,7 +635,7 @@
       if (isIOS() && !isStandalone()) {
         els.notifyBtn.classList.remove("hidden");
         els.notifyBtn.textContent = "🔔 Add to Home Screen for reminders";
-        els.notifyBtn.addEventListener("click", () => showInstallBanner(true));
+        els.notifyBtn.addEventListener("click", showAddToHomeScreenModal);
       }
       return;
     }
@@ -659,7 +675,7 @@
 
         const permission = await withTimeout(Notification.requestPermission(), 8000);
         if (permission !== "granted") {
-          if (isIOS() && !isStandalone()) showInstallBanner(true);
+          if (isIOS() && !isStandalone()) showAddToHomeScreenModal();
           return;
         }
 
@@ -675,7 +691,7 @@
         setNotifyBtnState(true);
       } catch (err) {
         if (isIOS() && !isStandalone()) {
-          showInstallBanner(true);
+          showAddToHomeScreenModal();
         } else {
           setMsg("Couldn't enable notifications on this browser.", "bad");
         }
@@ -691,36 +707,18 @@
   }
 
   // ---------- Install prompt ----------
+  // Android/Chrome: a real native install prompt exists (beforeinstallprompt),
+  // so a small banner + one tap is enough -- no instructions needed.
   let deferredInstallPrompt = null;
-
-  function showInstallBanner(force) {
-    if (isStandalone()) return;
-    if (!force && localStorage.getItem("wordladder:dismissedInstall")) return;
-
-    if (isIOS()) {
-      els.installBannerText.textContent = "📲 Add to Home Screen (tap Share, then \"Add to Home Screen\") for the full app experience and reminders.";
-      els.installBanner.classList.remove("hidden");
-    } else if (deferredInstallPrompt) {
-      els.installBannerText.textContent = "📲 Install Word Ladder as an app for the full experience.";
-      els.installBtn.classList.remove("hidden");
-      els.installBanner.classList.remove("hidden");
-    } else {
-      return;
-    }
-
-    // The banner lives at the top of the page, but this can be triggered from a
-    // button down in the footer -- scroll it into view so it's actually seen
-    // instead of silently appearing off-screen above the current scroll position.
-    if (force) {
-      els.installBanner.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
 
   function initInstallBanner() {
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
-      showInstallBanner(false);
+      if (localStorage.getItem("wordladder:dismissedInstall")) return;
+      els.installBannerText.textContent = "📲 Install Word Ladder as an app for the full experience.";
+      els.installBtn.classList.remove("hidden");
+      els.installBanner.classList.remove("hidden");
     });
 
     els.installBtn.addEventListener("click", async () => {
@@ -735,8 +733,18 @@
       els.installBanner.classList.add("hidden");
       localStorage.setItem("wordladder:dismissedInstall", "1");
     });
+  }
 
-    if (isIOS()) showInstallBanner(false);
+  // iOS: there is no API to trigger "Add to Home Screen" programmatically --
+  // Apple doesn't expose one to web pages. All we can do is explain the two
+  // manual taps, in a modal that appears wherever the user already is (no
+  // banner to scroll to, no clicking "Install" that silently can't work).
+  function showAddToHomeScreenModal() {
+    els.addToHomeModal.classList.remove("hidden");
+  }
+
+  function hideAddToHomeScreenModal() {
+    els.addToHomeModal.classList.add("hidden");
   }
 
   // ---------- How to play ----------
@@ -758,6 +766,7 @@
   els.randomBtn.addEventListener("click", () => startPuzzle(randomPuzzle(), "random"));
   els.helpBtn.addEventListener("click", showHowToPlay);
   els.howToPlayCloseBtn.addEventListener("click", hideHowToPlay);
+  els.addToHomeCloseBtn.addEventListener("click", hideAddToHomeScreenModal);
   els.shareBtn.addEventListener("click", async () => {
     const text = els.shareText.textContent;
 
