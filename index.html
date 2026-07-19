@@ -479,6 +479,7 @@
   let hintsLeft = 3;
   let mode = "daily";
   let currentShareText = "";
+  let hintedIndices = new Set(); // chain indices that were filled in via a hint, not typed by the player
 
   const els = {
     todayLabel: document.getElementById("todayLabel"),
@@ -589,6 +590,7 @@
     mode = m;
     chain = [puzzle.start];
     hintsLeft = 3;
+    hintedIndices = new Set();
     els.hintsLeftEl.textContent = hintsLeft;
     els.hintBtn.disabled = false;
     els.winPanel.classList.add("hidden");
@@ -604,11 +606,13 @@
       const saved = loadState(puzzle.key);
       if (saved && saved.solved) {
         chain = saved.chain;
+        hintedIndices = new Set(saved.hintedIndices || []);
         renderTarget();
         renderLadder();
         showWin(saved.chain.length - 1, true);
       } else if (saved && saved.chain) {
         chain = saved.chain;
+        hintedIndices = new Set(saved.hintedIndices || []);
         renderTarget();
         renderLadder();
       }
@@ -617,19 +621,38 @@
 
   function persistDailyProgress() {
     if (mode !== "daily") return;
-    saveState(puzzle.key, { chain, solved: chain[chain.length - 1] === puzzle.target });
+    saveState(puzzle.key, {
+      chain, solved: chain[chain.length - 1] === puzzle.target,
+      hintedIndices: [...hintedIndices],
+    });
   }
 
   function showWin(moves, alreadySolved) {
     els.playArea.classList.add("hidden");
     els.winPanel.classList.remove("hidden");
     const extra = moves - puzzle.optimal;
-    els.winSummary.textContent = `${moves} move${moves === 1 ? "" : "s"} · optimal was ${puzzle.optimal}` + (extra > 0 ? ` (+${extra})` : " — perfect!");
-    const rungIcons = chain.slice(1).map((_, i) => (i < puzzle.optimal ? "🟩" : "🟨")).join("") || "✅";
+    const hintsUsed = hintedIndices.size;
+    const perfect = extra <= 0 && hintsUsed === 0;
+
+    let summaryTail = perfect ? " — perfect!" : (extra > 0 ? ` (+${extra})` : "");
+    if (hintsUsed > 0) summaryTail += ` · ${hintsUsed} hint${hintsUsed === 1 ? "" : "s"} used`;
+    els.winSummary.textContent = `${moves} move${moves === 1 ? "" : "s"} · optimal was ${puzzle.optimal}` + summaryTail;
+
+    // Hinted steps get their own color so the grid honestly shows how the puzzle
+    // was actually solved, not just the move count -- using every hint on a puzzle
+    // that only needs a few moves used to still show up as a flawless "perfect!".
+    const rungIcons = chain.slice(1).map((_, i) => {
+      const chainIdx = i + 1;
+      if (hintedIndices.has(chainIdx)) return "🟦";
+      return i < puzzle.optimal ? "🟩" : "🟨";
+    }).join("") || "✅";
+
     const puzzleLabel = mode === "daily" ? "today's Word Ladder" : "a Word Ladder puzzle";
-    const challenge = extra > 0
-      ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) 🪜 Can you beat me?`
-      : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! 🪜 Think you can match it?`;
+    const challenge = perfect
+      ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! 🪜 Think you can match it?`
+      : hintsUsed > 0
+        ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (used ${hintsUsed} hint${hintsUsed === 1 ? "" : "s"}) 🪜 Can you beat me without hints?`
+        : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) 🪜 Can you beat me?`;
     const chainLine = `${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}`;
     const shareUrl = shareUrlFor();
     currentShareText = `${challenge}\n${chainLine}\n${rungIcons}\n${shareUrl}`;
@@ -704,6 +727,7 @@
     els.hintBtn.disabled = hintsLeft <= 0;
     const next = options[0];
     chain.push(next);
+    hintedIndices.add(chain.length - 1);
     els.input.value = "";
     renderLadder();
     persistDailyProgress();
