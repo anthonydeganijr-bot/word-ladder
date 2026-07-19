@@ -161,9 +161,18 @@
   .win-panel h2 { margin: 4px 0; font-size: 22px; }
   .win-panel p { color: var(--sub); font-size: 14px; margin: 4px 0 14px; }
   .share-box {
-    background: var(--tile-target); border-radius: 12px; padding: 12px;
-    font-size: 13px; white-space: pre-wrap; text-align: left; margin-bottom: 12px;
-    font-family: ui-monospace, monospace;
+    background: var(--tile-target); border-radius: 14px; padding: 16px 18px;
+    text-align: center; margin-bottom: 12px;
+  }
+  .share-challenge { font-weight: 700; font-size: 14px; color: var(--ink); margin: 0 0 10px; line-height: 1.4; }
+  .share-chain {
+    font-weight: 700; font-size: 13px; color: var(--sub); margin: 0 0 8px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .share-grid { font-size: 19px; letter-spacing: 5px; margin: 0 0 12px; }
+  .share-link {
+    font-size: 12px; color: var(--accent); margin: 0; word-break: break-all;
+    padding-top: 10px; border-top: 1px dashed var(--tile-border);
   }
   footer { text-align: center; margin-top: 20px; color: var(--sub); font-size: 12px; }
   .support-link {
@@ -231,7 +240,12 @@
     <div id="winPanel" class="win-panel hidden">
       <h2>🎉 Solved!</h2>
       <p id="winSummary"></p>
-      <div class="share-box" id="shareText"></div>
+      <div class="share-box">
+        <p class="share-challenge" id="shareChallenge"></p>
+        <p class="share-chain" id="shareChain"></p>
+        <p class="share-grid" id="shareGrid"></p>
+        <p class="share-link" id="shareLink"></p>
+      </div>
       <div class="toolbar">
         <button class="btn-primary" id="shareBtn" style="flex:1">🔗 Share Result</button>
         <button class="btn-ghost" id="randomBtn">🎲 New Puzzle</button>
@@ -409,6 +423,7 @@
   let chain = [];
   let hintsLeft = 3;
   let mode = "daily";
+  let currentShareText = "";
 
   const els = {
     todayLabel: document.getElementById("todayLabel"),
@@ -424,7 +439,10 @@
     resetBtn: document.getElementById("resetBtn"),
     winPanel: document.getElementById("winPanel"),
     winSummary: document.getElementById("winSummary"),
-    shareText: document.getElementById("shareText"),
+    shareChallenge: document.getElementById("shareChallenge"),
+    shareChain: document.getElementById("shareChain"),
+    shareGrid: document.getElementById("shareGrid"),
+    shareLink: document.getElementById("shareLink"),
     shareBtn: document.getElementById("shareBtn"),
     randomBtn: document.getElementById("randomBtn"),
     notifyBtn: document.getElementById("notifyBtn"),
@@ -554,7 +572,12 @@
     const challenge = extra > 0
       ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) 🪜 Can you beat me?`
       : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! 🪜 Think you can match it?`;
-    els.shareText.textContent = `${challenge}\n${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}\n${rungIcons}\n${GAME_URL}`;
+    const chainLine = `${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}`;
+    currentShareText = `${challenge}\n${chainLine}\n${rungIcons}\n${GAME_URL}`;
+    els.shareChallenge.textContent = challenge;
+    els.shareChain.textContent = chainLine;
+    els.shareGrid.textContent = rungIcons;
+    els.shareLink.textContent = GAME_URL;
     if (!alreadySolved) bumpStreakOnWin();
   }
 
@@ -771,7 +794,7 @@
   els.howToPlayCloseBtn.addEventListener("click", hideHowToPlay);
   els.addToHomeCloseBtn.addEventListener("click", hideAddToHomeScreenModal);
   els.shareBtn.addEventListener("click", async () => {
-    const text = els.shareText.textContent;
+    const text = currentShareText;
 
     if (navigator.share) {
       try {
