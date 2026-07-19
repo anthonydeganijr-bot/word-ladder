@@ -1,0 +1,15 @@
+{
+  "name": "Word Ladder",
+  "short_name": "Word Ladder",
+  "description": "A daily word-ladder puzzle — change one letter at a time to climb from a start word to the goal.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f3ef",
+  "theme_color": "#4b6cff",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
