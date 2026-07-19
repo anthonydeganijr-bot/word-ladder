@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Word Ladder</title>
+<meta name="description" content="A daily word-ladder puzzle — change one letter at a time to climb from a start word to the goal.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4b6cff">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Word Ladder">
+<!-- Cloudflare Web Analytics -->
+<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6202e64876a64128b6abd35d6bf2d0da"}'></script>
+<!-- End Cloudflare Web Analytics -->
 <style>
   :root {
     --bg: #f4f3ef;
@@ -55,6 +65,20 @@
     font-weight: 700; font-size: 14px; padding: 0; cursor: pointer; line-height: 1;
   }
   .help-btn:hover { color: var(--ink); border-color: var(--accent); }
+  .install-banner {
+    display: flex; align-items: center; gap: 8px; justify-content: center;
+    background: var(--tile-target); border: 1px solid var(--tile-border); border-radius: 12px;
+    padding: 8px 12px; margin-bottom: 14px; font-size: 12px; color: var(--sub); text-align: left;
+  }
+  .install-btn {
+    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 8px;
+    padding: 5px 10px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+  }
+  .install-close {
+    background: none; border: none; color: var(--sub); cursor: pointer; font-size: 14px;
+    padding: 0 2px; flex-shrink: 0; line-height: 1;
+  }
+  .install-close:hover { color: var(--ink); }
   h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.02em; }
   .tagline { color: var(--sub); font-size: 14px; margin: 0; }
   .datebar {
@@ -164,6 +188,12 @@
 </head>
 <body>
 <div class="wrap">
+  <div id="installBanner" class="install-banner hidden">
+    <span id="installBannerText"></span>
+    <button id="installBtn" class="install-btn hidden">📲 Install</button>
+    <button id="installBannerClose" class="install-close" aria-label="Dismiss">✕</button>
+  </div>
+
   <header>
     <button id="helpBtn" class="help-btn" aria-label="How to play">?</button>
     <h1>🪜 Word Ladder</h1>
@@ -199,7 +229,7 @@
       <p id="winSummary"></p>
       <div class="share-box" id="shareText"></div>
       <div class="toolbar">
-        <button class="btn-primary" id="shareBtn" style="flex:1">📋 Copy Result</button>
+        <button class="btn-primary" id="shareBtn" style="flex:1">🔗 Share Result</button>
         <button class="btn-ghost" id="randomBtn">🎲 New Puzzle</button>
       </div>
     </div>
@@ -242,6 +272,16 @@
 <script>
 (function() {
   "use strict";
+
+  const GAME_URL = "https://anthonydeganijr-bot.github.io/word-ladder/";
+
+  function isStandalone() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  }
+
+  function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
 
   // ---------- Word list ----------
   const RAW_WORDS = ["able","acid","aged","also","area","army","away","back","ball","band","bank","base","bath","bead","beam","bean","bear","beat","been","beer","bell","belt","bend","best","bike","bill","bird","bite","blue","boat","body","bold","bolt","bone","book","boot","born","boss","both","bowl","bulk","bull","burn","bush","busy","cake","call","calm","came","camp","cane","cape","card","care","cart","case","cash","cast","cave","cell","chat","chip","city","club","coal","coat","code","cold","come","cook","cool","cope","copy","cord","core","corn","cost","cozy","crew","crop","dark","dash","data","date","dawn","days","dead","deal","dear","debt","deck","deed","deep","deer","deny","desk","dial","dice","diet","dime","dirt","dish","disk","dive","does","done","doom","door","dose","down","drag","draw","drew","drop","drug","drum","dual","duck","dude","duke","dull","dump","dust","duty","each","earn","ease","east","easy","edge","else","ends","envy","epic","even","ever","evil","exam","exit","face","fact","fade","fail","fair","fake","fall","fame","farm","fast","fate","feat","feed","feel","fees","feet","fell","felt","file","fill","film","find","fine","fire","firm","fish","five","flag","flat","flew","flow","foam","foil","fold","folk","fond","food","fool","foot","ford","form","fort","foul","four","fowl","free","from","fuel","full","fund","fuse","gain","gale","game","gang","gate","gave","gaze","gear","gene","gift","girl","give","glad","glow","glue","goal","goat","goes","gold","golf","gone","good","gray","grew","grey","grid","grim","grip","grow","gulf","gull","hair","half","hall","halt","hand","hang","hard","harm","hate","have","hawk","haze","head","heal","heap","hear","heat","heel","held","hell","helm","help","herb","herd","here","hero","hide","high","hike","hill","hint","hire","hive","hold","hole","holy","home","hood","hook","hope","horn","host","hour","huge","hull","hunt","hurt","hymn","icon","idea","idle","inch","into","iron","item","jail","jazz","jean","join","joke","jump","junk","jury","just","keen","keep","kept","kick","kill","kind","king","kiss","kite","knee","knew","know","lace","lack","lady","lake","lamb","lamp","land","lane","last","late","lawn","lazy","lead","leaf","lean","leap","left","lend","lens","less","lest","life","lift","like","lime","limp","line","link","lion","list","live","load","loaf","loan","lock","lone","long","look","loop","lord","lose","loss","lost","loud","love","luck","lump","lung","made","mail","main","make","male","mall","many","mark","mask","mass","mast","mate","math","maze","meal","mean","meat","meet","melt","mend","menu","mere","mesh","mess","mice","mild","mile","milk","mill","mind","mine","mint","miss","mist","mode","mold","mole","monk","mood","moon","more","moss","most","moth","move","much","mule","must","mute","myth","nail","name","navy","near","neat","neck","need","nest","news","next","nice","nine","node","none","noon","norm","nose","note","noun","oath","oval","oven","over","pace","pack","page","paid","pain","pair","pale","palm","park","part","pass","past","path","pave","peak","pear","peel","peer","pest","pick","pier","pile","pill","pine","pink","pipe","pity","plan","play","plot","plow","plug","plus","poem","poet","pole","poll","pond","pool","poor","pope","pork","port","pose","post","pour","pray","prep","prey","pull","pulp","pump","punk","pure","push","quiz","race","rack","rage","raid","rail","rain","rank","rare","rate","rave","read","real","reap","rear","redo","reef","reel","rely","rent","rest","rice","rich","ride","rise","risk","road","roar","robe","rock","rode","role","roll","roof","room","root","rope","rose","rosy","rude","rule","rush","rust","safe","sail","sake","sale","salt","same","sand","sane","save","scan","seal","seat","seed","seek","seem","seen","self","sell","send","sent","ship","shoe","shop","shot","show","shut","sick","side","sigh","sign","silk","sing","sink","site","size","skew","skin","skip","slam","slap","slid","slim","slip","slot","slow","snap","snow","soak","soap","sock","soda","sofa","soft","soil","sold","sole","some","song","soon","sore","sort","soul","soup","sour","spin","spit","spot","spun","spur","star","stay","stem","step","stew","stir","stop","sure","surf","swam","swan","swap","swim","tack","tail","take","tale","talk","tall","tame","tank","tape","task","teal","team","tear","teen","tell","tend","tent","term","test","text","than","that","thaw","them","then","they","thin","this","thus","tick","tide","tidy","tile","till","tilt","time","tiny","tire","toad","told","toll","tomb","tone","tons","tool","tore","torn","toss","tour","town","trap","tray","tree","trek","trim","trip","true","tuba","tube","tuck","tuna","tune","turf","turn","twin","type","ugly","unit","upon","urge","used","user","vain","vane","vast","veil","vein","verb","vest","veto","vice","view","vine","visa","void","vote","wade","wage","wait","wake","walk","wall","want","ward","warm","warn","wars","wash","wasp","wave","weak","wear","weed","week","well","west","what","when","whip","whom","wide","wife","wild","will","wind","wine","wing","wink","wipe","wire","wise","wish","with","wolf","wood","wool","word","wore","work","worm","worn","wrap","yard","yarn","year","yell","zero","zone","zoom"];
@@ -374,6 +414,10 @@
     helpBtn: document.getElementById("helpBtn"),
     howToPlay: document.getElementById("howToPlay"),
     howToPlayCloseBtn: document.getElementById("howToPlayCloseBtn"),
+    installBanner: document.getElementById("installBanner"),
+    installBannerText: document.getElementById("installBannerText"),
+    installBtn: document.getElementById("installBtn"),
+    installBannerClose: document.getElementById("installBannerClose"),
   };
 
   function makeTile(letter, cls) {
@@ -488,7 +532,7 @@
     els.winSummary.textContent = `${moves} move${moves === 1 ? "" : "s"} · optimal was ${puzzle.optimal}` + (extra > 0 ? ` (+${extra})` : " — perfect!");
     const rungIcons = chain.slice(1).map((_, i) => (i < puzzle.optimal ? "🟩" : "🟨")).join("") || "✅";
     const label = mode === "daily" ? `Word Ladder ${puzzle.key}` : "Word Ladder (random)";
-    els.shareText.textContent = `${label}\n${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}\n${moves}/${puzzle.optimal} moves ${rungIcons}`;
+    els.shareText.textContent = `${label}\n${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}\n${moves}/${puzzle.optimal} moves ${rungIcons}\nPlay: ${GAME_URL}`;
     if (!alreadySolved) bumpStreakOnWin();
   }
 
@@ -567,7 +611,15 @@
   }
 
   async function initNotifyButton() {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      // iOS Safari only exposes the Push API to home-screen installs, not regular tabs.
+      if (isIOS() && !isStandalone()) {
+        els.notifyBtn.classList.remove("hidden");
+        els.notifyBtn.textContent = "🔔 Add to Home Screen for reminders";
+        els.notifyBtn.addEventListener("click", () => showInstallBanner(true));
+      }
+      return;
+    }
     els.notifyBtn.classList.remove("hidden");
 
     const registration = await navigator.serviceWorker.register("sw.js");
@@ -609,6 +661,46 @@
     els.notifyBtn.textContent = subscribed ? "🔕 Turn off daily reminder" : "🔔 Get a daily reminder";
   }
 
+  // ---------- Install prompt ----------
+  let deferredInstallPrompt = null;
+
+  function showInstallBanner(force) {
+    if (isStandalone()) return;
+    if (!force && localStorage.getItem("wordladder:dismissedInstall")) return;
+
+    if (isIOS()) {
+      els.installBannerText.textContent = "📲 Add to Home Screen (tap Share, then \"Add to Home Screen\") for the full app experience and reminders.";
+      els.installBanner.classList.remove("hidden");
+    } else if (deferredInstallPrompt) {
+      els.installBannerText.textContent = "📲 Install Word Ladder as an app for the full experience.";
+      els.installBtn.classList.remove("hidden");
+      els.installBanner.classList.remove("hidden");
+    }
+  }
+
+  function initInstallBanner() {
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      showInstallBanner(false);
+    });
+
+    els.installBtn.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      els.installBanner.classList.add("hidden");
+    });
+
+    els.installBannerClose.addEventListener("click", () => {
+      els.installBanner.classList.add("hidden");
+      localStorage.setItem("wordladder:dismissedInstall", "1");
+    });
+
+    if (isIOS()) showInstallBanner(false);
+  }
+
   // ---------- How to play ----------
   function showHowToPlay() {
     els.howToPlay.classList.remove("hidden");
@@ -630,10 +722,21 @@
   els.howToPlayCloseBtn.addEventListener("click", hideHowToPlay);
   els.shareBtn.addEventListener("click", async () => {
     const text = els.shareText.textContent;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ text, url: GAME_URL });
+        return;
+      } catch (err) {
+        if (err.name === "AbortError") return; // user closed the share sheet
+        // fall through to the clipboard fallback below
+      }
+    }
+
     try {
       await navigator.clipboard.writeText(text);
       els.shareBtn.textContent = "✅ Copied!";
-      setTimeout(() => els.shareBtn.textContent = "📋 Copy Result", 1500);
+      setTimeout(() => els.shareBtn.textContent = "🔗 Share Result", 1500);
     } catch {
       alert(text);
     }
@@ -644,6 +747,7 @@
   updateStreakDisplay();
   startPuzzle(dailyPuzzle(), "daily");
   initNotifyButton();
+  initInstallBanner();
   if (!localStorage.getItem("wordladder:seenHowToPlay")) {
     showHowToPlay();
   }
