@@ -205,17 +205,17 @@
 <div class="wrap">
   <div id="installBanner" class="install-banner hidden">
     <span id="installBannerText"></span>
-    <button id="installBtn" class="install-btn hidden">📲 Install</button>
+    <button id="installBtn" class="install-btn hidden">Install</button>
     <button id="installBannerClose" class="install-close" aria-label="Dismiss">✕</button>
   </div>
 
   <header>
     <button id="helpBtn" class="help-btn" aria-label="How to play">?</button>
-    <h1>🪜 Word Ladder</h1>
+    <h1>Word Ladder</h1>
     <p class="tagline">Change one letter at a time to climb from START to GOAL.</p>
     <div class="datebar">
       <span id="todayLabel"></span>
-      <span class="streak">🔥 <span id="streakCount">0</span> day streak</span>
+      <span class="streak"><span id="streakCount">0</span> day streak</span>
     </div>
   </header>
 
@@ -234,13 +234,13 @@
       </div>
       <div id="msg" class="msg"></div>
       <div class="toolbar">
-        <button class="btn-ghost" id="hintBtn">💡 Hint (<span id="hintsLeft">3</span>)</button>
-        <button class="btn-ghost" id="resetBtn">↺ Restart</button>
+        <button class="btn-ghost" id="hintBtn">Hint (<span id="hintsLeft">3</span>)</button>
+        <button class="btn-ghost" id="resetBtn">Restart</button>
       </div>
     </div>
 
     <div id="winPanel" class="win-panel hidden">
-      <h2>🎉 Solved!</h2>
+      <h2>Solved!</h2>
       <p id="winSummary"></p>
       <div class="share-box">
         <p class="share-challenge" id="shareChallenge"></p>
@@ -249,8 +249,8 @@
         <p class="share-link" id="shareLink"></p>
       </div>
       <div class="toolbar">
-        <button class="btn-primary" id="shareBtn" style="flex:1">🔗 Share Result</button>
-        <button class="btn-ghost" id="randomBtn">🎲 New Puzzle</button>
+        <button class="btn-primary" id="shareBtn" style="flex:1">Share Result</button>
+        <button class="btn-ghost" id="randomBtn">New Puzzle</button>
       </div>
     </div>
   </div>
@@ -258,11 +258,11 @@
   <footer>
     One daily puzzle for everyone · unlimited random puzzles anytime
     <br>
-    <a class="support-link" href="https://buymeacoffee.com/anthonydegani" target="_blank" rel="noopener">☕ Support this game</a>
+    <a class="support-link" href="https://buymeacoffee.com/anthonydegani" target="_blank" rel="noopener">Support this game</a>
     ·
-    <button id="notifyBtn" class="support-link hidden">🔔 Get a daily reminder</button>
+    <button id="notifyBtn" class="support-link hidden">Get a daily reminder</button>
     <br>
-    <a class="support-link" href="../">🎮 More Games</a>
+    <a class="support-link" href="../">More Games</a>
     ·
     <a class="support-link" href="privacy.html">Privacy Policy</a>
   </footer>
@@ -270,7 +270,7 @@
 
 <div id="howToPlay" class="modal-overlay hidden">
   <div class="modal-panel">
-    <h2>🪜 How to Play</h2>
+    <h2>How to Play</h2>
     <p>Change one letter at a time to turn the <strong>START</strong> word into the <strong>GOAL</strong> word.</p>
     <div class="example-ladder">
       <div class="rung">
@@ -286,7 +286,7 @@
     <ul>
       <li>Every word along the way must be a real word.</li>
       <li>You can't reuse a word you've already used.</li>
-      <li>💡 Stuck? Use a hint — you get 3 per puzzle.</li>
+      <li>Stuck? Use a hint — you get 3 per puzzle.</li>
     </ul>
     <p class="modal-foot">One shared daily puzzle for everyone · unlimited random puzzles anytime.</p>
     <button class="btn-primary" id="howToPlayCloseBtn" style="width:100%">Let's play!</button>
@@ -295,7 +295,7 @@
 
 <div id="addToHomeModal" class="modal-overlay hidden">
   <div class="modal-panel">
-    <h2>📲 Get Reminders</h2>
+    <h2>Get Reminders</h2>
     <p>To get a daily reminder, add Word Ladder to your Home Screen. It only takes two taps:</p>
     <ol class="big-steps">
       <li id="addToHomeStep1"></li>
@@ -352,12 +352,12 @@
     return {
       step1: 'Tap the <strong>Share</strong> icon (a square with an arrow) at the <strong>bottom</strong> of the screen.',
       step2: 'Tap <strong>"Add to Home Screen"</strong>.',
-      tip: 'Don\'t see it in the list? Scroll to the very bottom and tap <strong>"Edit Actions..."</strong>, then tap the ➕ next to "Add to Home Screen" — then go back and tap it.',
+      tip: 'Don\'t see it in the list? Scroll to the very bottom and tap <strong>"Edit Actions..."</strong>, then tap the + icon next to "Add to Home Screen" — then go back and tap it.',
     };
   }
 
   // ---------- Word list ----------
-  const RAW_WORDS = ["able","acid","aged","also","area","army","away","back","ball","band","bank","base","bath","bead","beam","bean","bear","beat","been","beer","bell","belt","bend","best","bike","bill","bird","bite","blue","boat","body","bold","bolt","bone","book","boot","born","boss","both","bowl","bulk","bull","burn","bush","busy","cake","call","calm","came","camp","cane","cape","card","care","cart","case","cash","cast","cave","cell","chat","chip","city","club","coal","coat","code","cold","come","cook","cool","cope","copy","cord","core","corn","cost","cozy","crew","crop","dark","dash","data","date","dawn","days","dead","deal","dear","debt","deck","deed","deep","deer","deny","desk","dial","dice","diet","dime","dirt","dish","disk","dive","does","done","doom","door","dose","down","drag","draw","drew","drop","drug","drum","dual","duck","dude","duke","dull","dump","dust","duty","each","earn","ease","east","easy","edge","else","ends","envy","epic","even","ever","evil","exam","exit","face","fact","fade","fail","fair","fake","fall","fame","farm","fast","fate","feat","feed","feel","fees","feet","fell","felt","file","fill","film","find","fine","fire","firm","fish","five","flag","flat","flew","flow","foam","foil","fold","folk","fond","food","fool","foot","ford","form","fort","foul","four","fowl","free","from","fuel","full","fund","fuse","gain","gale","game","gang","gate","gave","gaze","gear","gene","gift","girl","give","glad","glow","glue","goal","goat","goes","gold","golf","gone","good","gray","grew","grey","grid","grim","grip","grow","gulf","gull","hair","half","hall","halt","hand","hang","hard","harm","hate","have","hawk","haze","head","heal","heap","hear","heat","heel","held","hell","helm","help","herb","herd","here","hero","hide","high","hike","hill","hint","hire","hive","hold","hole","holy","home","hood","hook","hope","horn","host","hour","huge","hull","hunt","hurt","hymn","icon","idea","idle","inch","into","iron","item","jail","jazz","jean","join","joke","jump","junk","jury","just","keen","keep","kept","kick","kill","kind","king","kiss","kite","knee","knew","know","lace","lack","lady","lake","lamb","lamp","land","lane","last","late","lawn","lazy","lead","leaf","lean","leap","left","lend","lens","less","lest","life","lift","like","lime","limp","line","link","lion","list","live","load","loaf","loan","lock","lone","long","look","loop","lord","lose","loss","lost","loud","love","luck","lump","lung","made","mail","main","make","male","mall","many","mark","mask","mass","mast","mate","math","maze","meal","mean","meat","meet","melt","mend","menu","mere","mesh","mess","mice","mild","mile","milk","mill","mind","mine","mint","miss","mist","mode","mold","mole","monk","mood","moon","more","moss","most","moth","move","much","mule","must","mute","myth","nail","name","navy","near","neat","neck","need","nest","news","next","nice","nine","node","none","noon","norm","nose","note","noun","oath","oval","oven","over","pace","pack","page","paid","pain","pair","pale","palm","park","part","pass","past","path","pave","peak","pear","peel","peer","pest","pick","pier","pile","pill","pine","pink","pipe","pity","plan","play","plot","plow","plug","plus","poem","poet","pole","poll","pond","pool","poor","pope","pork","port","pose","post","pour","pray","prep","prey","pull","pulp","pump","punk","pure","push","quiz","race","rack","rage","raid","rail","rain","rank","rare","rate","rave","read","real","reap","rear","redo","reef","reel","rely","rent","rest","rice","rich","ride","rise","risk","road","roar","robe","rock","rode","role","roll","roof","room","root","rope","rose","rosy","rude","rule","rush","rust","safe","sail","sake","sale","salt","same","sand","sane","save","scan","seal","seat","seed","seek","seem","seen","self","sell","send","sent","ship","shoe","shop","shot","show","shut","sick","side","sigh","sign","silk","sing","sink","site","size","skew","skin","skip","slam","slap","slid","slim","slip","slot","slow","snap","snow","soak","soap","sock","soda","sofa","soft","soil","sold","sole","some","song","soon","sore","sort","soul","soup","sour","spin","spit","spot","spun","spur","star","stay","stem","step","stew","stir","stop","sure","surf","swam","swan","swap","swim","tack","tail","take","tale","talk","tall","tame","tank","tape","task","teal","team","tear","teen","tell","tend","tent","term","test","text","than","that","thaw","them","then","they","thin","this","thus","tick","tide","tidy","tile","till","tilt","time","tiny","tire","toad","told","toll","tomb","tone","tons","tool","tore","torn","toss","tour","town","trap","tray","tree","trek","trim","trip","true","tuba","tube","tuck","tuna","tune","turf","turn","twin","type","ugly","unit","upon","urge","used","user","vain","vane","vast","veil","vein","verb","vest","veto","vice","view","vine","visa","void","vote","wade","wage","wait","wake","walk","wall","want","ward","warm","warn","wars","wash","wasp","wave","weak","wear","weed","week","well","west","what","when","whip","whom","wide","wife","wild","will","wind","wine","wing","wink","wipe","wire","wise","wish","with","wolf","wood","wool","word","wore","work","worm","worn","wrap","yard","yarn","year","yell","zero","zone","zoom"];
+  const RAW_WORDS = ["able","ache","acid","acne","acre","afar","aged","ahem","aide","alas","ally","also","alto","amen","amid","ammo","ante","anti","apex","aqua","arch","area","aria","arms","army","atom","atop","aunt","aura","auto","avid","away","axes","axis","axle","baba","babe","baby","bach","back","bail","bait","bake","bald","ball","balm","band","bang","bank","barb","bare","bark","barn","base","bash","bass","bath","bats","bead","beam","bean","bear","beat","beau","beck","beef","been","beer","bees","bell","belt","bend","bent","berg","best","beta","bias","bike","bill","bind","bing","bird","bite","blah","bled","bloc","blow","blue","blur","boar","boat","body","boil","bold","bolt","bomb","bond","bone","bong","book","boom","boon","boot","bore","born","boss","both","bout","bowl","brag","brat","bred","brew","brow","buck","buff","bulb","bulk","bull","bump","bunk","burn","burr","bury","bush","bust","busy","butt","buzz","cage","cake","calf","call","calm","came","camp","cane","cant","cape","card","care","carp","cart","case","cash","cast","cave","cell","cent","chai","chap","char","chat","chef","chew","chic","chin","chip","chit","chop","chow","cite","city","clad","clam","clan","clap","claw","clip","club","clue","coal","coat","code","coil","coin","coke","cola","cold","colt","coma","comb","come","cone","cook","cool","coop","cope","copy","cord","core","cork","corn","corp","cost","coup","cove","cozy","crab","crap","crew","crib","crop","crow","cube","cuff","cult","curb","cure","curl","cute","daft","dame","damn","damp","dang","dare","dark","darn","dart","dash","data","date","dawn","days","dead","deaf","deal","dear","debt","deck","deed","deep","deer","defy","dell","dent","deny","desk","dial","dice","diet","digs","dime","dine","ding","dire","dirt","disc","dish","disk","diva","dive","dock","does","dogs","dole","doll","dome","done","doom","door","dope","dorm","dose","dove","down","drag","draw","drew","drip","drop","drug","drum","dual","duck","duct","dude","duel","duet","duff","duke","dull","duly","dumb","dump","dune","dung","dunk","dusk","dust","duty","each","earn","ease","east","easy","eats","echo","edge","edit","else","ends","envy","epic","even","ever","evil","exam","exit","eyed","face","fact","fade","fail","fair","fake","fall","fame","fang","fare","farm","fast","fate","fear","feat","feed","feel","fees","feet","fell","felt","fern","fest","fiat","fife","file","fill","film","find","fine","fink","fire","firm","fish","fist","five","flag","flap","flat","flaw","flea","fled","flee","flew","flex","flip","flop","flow","flux","foam","foil","fold","folk","fond","font","food","fool","foot","ford","fore","fork","form","fort","foul","four","fowl","frat","free","fret","frog","from","fuel","full","fund","funk","fury","fuse","fuss","gage","gain","gala","gale","gall","game","gang","gasp","gate","gave","gaze","gear","geek","gene","germ","gift","girl","give","glad","glow","glue","goal","goat","goes","gold","golf","gone","gong","good","gore","gosh","gown","grab","grad","gram","gray","grew","grey","grid","grim","grin","grip","grit","grow","grub","gulf","gull","guru","hack","hail","hair","hale","half","hall","halo","halt","hand","hang","hard","hare","harm","harp","hart","hash","hate","hath","haul","have","hawk","haze","head","heal","heap","hear","heat","heck","heed","heel","heir","held","hell","helm","help","hemp","herb","herd","here","hero","hers","hide","high","hike","hill","hind","hint","hire","hive","hoax","hobo","hold","hole","holy","home","hood","hook","hoop","hope","horn","hose","host","hour","howl","huge","hulk","hull","hump","hung","hunk","hunt","hurt","hush","hymn","iced","icon","idea","idle","idol","imam","inch","into","iris","iron","isle","itch","item","jade","jail","jazz","jean","jeep","jerk","jive","join","joke","judo","jump","junk","jury","just","keen","keep","kept","kick","kill","kilo","kind","king","kiss","kite","kiwi","knee","knew","knit","knob","knot","know","lace","lack","lady","laid","lair","lake","lamb","lame","lamp","land","lane","lark","lass","last","late","lava","lawn","lazy","lead","leaf","leak","lean","leap","left","lend","lens","lent","less","lest","levy","liar","lice","lick","lied","lien","lieu","life","lift","like","lily","limb","lime","limo","limp","line","ling","link","lion","lira","lisp","list","lite","live","load","loaf","loan","lobe","loch","lock","loco","loft","logo","lone","long","look","loop","loot","lord","lore","lose","loss","lost","lots","loud","love","lube","luck","lump","lung","lure","lush","lust","lynx","mace","mack","made","maid","mail","main","make","male","mall","malt","mana","many","mare","mark","mart","mash","mask","mass","mast","mate","math","maze","mead","meal","mean","meat","meet","melt","memo","mend","menu","mere","mesa","mesh","mess","meta","mice","mild","mile","milk","mill","mime","mind","mine","mink","mint","miss","mist","moan","mock","mode","mojo","mold","mole","monk","mono","mood","moon","moor","more","moss","most","moth","move","much","muck","mule","muse","must","mute","mutt","myth","nail","name","nana","navy","near","neat","neck","need","neon","ness","nest","news","next","nice","nine","node","noir","none","noon","nope","norm","nose","note","noun","nova","nude","nuke","null","numb","oath","obey","odds","odor","ogre","oily","omen","once","only","onto","opal","open","oral","otto","ouch","ours","oval","oven","over","pace","pack","pact","page","paid","pain","pair","pale","palm","pant","papa","para","park","part","pass","past","path","pave","pawn","peak","pear","peck","peek","peel","peep","peer","pest","pick","pier","pike","pile","pill","pine","pink","pint","pipe","piss","pity","plan","play","plea","plot","plow","plug","plum","plus","poem","poet","poke","pole","poll","polo","poly","pond","pong","pony","pool","poop","poor","pope","pork","port","pose","posh","post","pour","pray","prep","prey","prod","prof","prop","puck","puff","puke","pull","pulp","puma","pump","punk","pure","push","quad","quid","quit","quiz","race","rack","raft","rage","raid","rail","rain","rake","ramp","rang","rank","rant","rare","rash","rate","rave","read","real","reap","rear","redo","reed","reef","reel","rely","rent","reps","rest","rice","rich","ride","riff","rift","ring","rink","riot","ripe","rise","risk","rite","road","roam","roar","robe","rock","rode","role","roll","roof","rook","room","root","rope","rose","rosy","ruby","rude","ruin","rule","rush","rust","sack","safe","saga","sage","said","sail","sake","sale","salt","same","sand","sane","sang","sank","sans","sari","save","scam","scan","scar","scat","scum","seal","seat","sect","seed","seek","seem","seen","self","sell","semi","send","sent","sewn","sexy","shah","sham","shea","shed","shin","ship","shoe","shop","shot","show","shut","sick","side","sigh","sign","silk","sing","sink","sire","site","size","skew","skid","skin","skip","slab","slam","slap","slay","sled","slid","slim","slip","slit","slot","slow","slug","snap","snow","soak","soap","soar","sock","soda","sofa","soft","soil","sold","sole","solo","some","song","sons","soon","sore","sort","soul","soup","sour","spam","span","spec","spin","spit","spot","spun","spur","stab","stag","star","stay","stem","step","stew","stir","stop","stub","stud","stun","such","suck","suit","sung","sunk","sure","surf","swam","swan","swap","swat","sway","swim","sync","tack","tail","take","tale","talk","tall","tame","tang","tank","tape","taps","tart","task","taxi","teal","team","tear","tech","teen","tell","temp","tend","tent","term","test","text","than","that","thaw","thee","them","then","they","thin","this","thou","thud","thug","thus","tick","tide","tidy","tied","tier","tiff","tile","till","tilt","time","ting","tiny","tire","toad","tofu","told","toll","tomb","tome","tone","tong","tons","took","tool","tops","tore","torn","toss","tote","tour","tout","town","tram","trap","tray","tree","trek","trim","trio","trip","true","tuba","tube","tuck","tuna","tune","turf","turn","twin","type","tyre","ugly","undo","unit","unto","upon","urge","used","user","vain","vale","vane","vary","vase","vast","veal","veil","vein","vent","verb","very","vest","veto","vial","vice","view","vile","vine","visa","void","volt","vote","wade","wage","wait","wake","walk","wall","wand","want","ward","ware","warm","warn","warp","wars","wary","wash","wasp","watt","wave","ways","weak","wear","weed","week","weep","weir","weld","well","went","were","west","what","when","whew","whip","whoa","whom","whoo","wick","wide","wife","wild","will","wilt","wind","wine","wing","wink","wipe","wire","wise","wish","with","woke","wolf","womb","wont","wood","woof","wool","word","wore","work","worm","worn","wrap","writ","yard","yarn","yeah","year","yell","yoga","your","yuan","zero","zeta","zinc","zone","zoom"];
 
   const WORDS = [...new Set(RAW_WORDS.filter(w => w.length === 4))];
   const WORD_SET = new Set(WORDS);
@@ -645,14 +645,14 @@
       const chainIdx = i + 1;
       if (hintedIndices.has(chainIdx)) return "🟦";
       return i < puzzle.optimal ? "🟩" : "🟨";
-    }).join("") || "✅";
+    }).join("") || "✓";
 
     const puzzleLabel = mode === "daily" ? "today's Word Ladder" : "a Word Ladder puzzle";
     const challenge = perfect
-      ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! 🪜 Think you can match it?`
+      ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! Think you can match it?`
       : hintsUsed > 0
-        ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (used ${hintsUsed} hint${hintsUsed === 1 ? "" : "s"}) 🪜 Can you beat me without hints?`
-        : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) 🪜 Can you beat me?`;
+        ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (used ${hintsUsed} hint${hintsUsed === 1 ? "" : "s"}) Can you beat me without hints?`
+        : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) Can you beat me?`;
     const chainLine = `${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}`;
     const shareUrl = shareUrlFor();
     currentShareText = `${challenge}\n${chainLine}\n${rungIcons}\n${shareUrl}`;
@@ -757,7 +757,7 @@
       // iOS Safari only exposes the Push API to home-screen installs, not regular tabs.
       if (isIOS() && !isStandalone()) {
         els.notifyBtn.classList.remove("hidden");
-        els.notifyBtn.textContent = "🔔 Add to Home Screen for reminders";
+        els.notifyBtn.textContent = "Add to Home Screen for reminders";
         els.notifyBtn.addEventListener("click", showAddToHomeScreenModal);
       }
       return;
@@ -826,7 +826,7 @@
   }
 
   function setNotifyBtnState(subscribed) {
-    els.notifyBtn.textContent = subscribed ? "🔕 Turn off daily reminder" : "🔔 Get a daily reminder";
+    els.notifyBtn.textContent = subscribed ? "Turn off daily reminder" : "Get a daily reminder";
   }
 
   // ---------- Install prompt ----------
@@ -839,7 +839,7 @@
       e.preventDefault();
       deferredInstallPrompt = e;
       if (localStorage.getItem("wordladder:dismissedInstall")) return;
-      els.installBannerText.textContent = "📲 Install Word Ladder as an app for the full experience.";
+      els.installBannerText.textContent = "Install Word Ladder as an app for the full experience.";
       els.installBtn.classList.remove("hidden");
       els.installBanner.classList.remove("hidden");
     });
@@ -867,7 +867,7 @@
     els.addToHomeStep1.innerHTML = instr.step1;
     els.addToHomeStep2.innerHTML = instr.step2;
     if (instr.tip) {
-      els.addToHomeTip.innerHTML = "💡 " + instr.tip;
+      els.addToHomeTip.innerHTML = instr.tip;
       els.addToHomeTip.classList.remove("hidden");
     } else {
       els.addToHomeTip.classList.add("hidden");
@@ -917,8 +917,8 @@
 
     try {
       await navigator.clipboard.writeText(text);
-      els.shareBtn.textContent = "✅ Copied!";
-      setTimeout(() => els.shareBtn.textContent = "🔗 Share Result", 1500);
+      els.shareBtn.textContent = "Copied!";
+      setTimeout(() => els.shareBtn.textContent = "Share Result", 1500);
     } catch {
       alert(text);
     }
