@@ -205,17 +205,17 @@
 <div class="wrap">
   <div id="installBanner" class="install-banner hidden">
     <span id="installBannerText"></span>
-    <button id="installBtn" class="install-btn hidden">📲 Install</button>
+    <button id="installBtn" class="install-btn hidden">Install</button>
     <button id="installBannerClose" class="install-close" aria-label="Dismiss">✕</button>
   </div>
 
   <header>
     <button id="helpBtn" class="help-btn" aria-label="How to play">?</button>
-    <h1>🪜 Word Ladder</h1>
+    <h1>Word Ladder</h1>
     <p class="tagline">Change one letter at a time to climb from START to GOAL.</p>
     <div class="datebar">
       <span id="todayLabel"></span>
-      <span class="streak">🔥 <span id="streakCount">0</span> day streak</span>
+      <span class="streak"><span id="streakCount">0</span> day streak</span>
     </div>
   </header>
 
@@ -234,13 +234,13 @@
       </div>
       <div id="msg" class="msg"></div>
       <div class="toolbar">
-        <button class="btn-ghost" id="hintBtn">💡 Hint (<span id="hintsLeft">3</span>)</button>
-        <button class="btn-ghost" id="resetBtn">↺ Restart</button>
+        <button class="btn-ghost" id="hintBtn">Hint (<span id="hintsLeft">3</span>)</button>
+        <button class="btn-ghost" id="resetBtn">Restart</button>
       </div>
     </div>
 
     <div id="winPanel" class="win-panel hidden">
-      <h2>🎉 Solved!</h2>
+      <h2>Solved!</h2>
       <p id="winSummary"></p>
       <div class="share-box">
         <p class="share-challenge" id="shareChallenge"></p>
@@ -249,8 +249,8 @@
         <p class="share-link" id="shareLink"></p>
       </div>
       <div class="toolbar">
-        <button class="btn-primary" id="shareBtn" style="flex:1">🔗 Share Result</button>
-        <button class="btn-ghost" id="randomBtn">🎲 New Puzzle</button>
+        <button class="btn-primary" id="shareBtn" style="flex:1">Share Result</button>
+        <button class="btn-ghost" id="randomBtn">New Puzzle</button>
       </div>
     </div>
   </div>
@@ -258,11 +258,11 @@
   <footer>
     One daily puzzle for everyone · unlimited random puzzles anytime
     <br>
-    <a class="support-link" href="https://buymeacoffee.com/anthonydegani" target="_blank" rel="noopener">☕ Support this game</a>
+    <a class="support-link" href="https://buymeacoffee.com/anthonydegani" target="_blank" rel="noopener">Support this game</a>
     ·
-    <button id="notifyBtn" class="support-link hidden">🔔 Get a daily reminder</button>
+    <button id="notifyBtn" class="support-link hidden">Get a daily reminder</button>
     <br>
-    <a class="support-link" href="../">🎮 More Games</a>
+    <a class="support-link" href="../">More Games</a>
     ·
     <a class="support-link" href="privacy.html">Privacy Policy</a>
   </footer>
@@ -270,7 +270,7 @@
 
 <div id="howToPlay" class="modal-overlay hidden">
   <div class="modal-panel">
-    <h2>🪜 How to Play</h2>
+    <h2>How to Play</h2>
     <p>Change one letter at a time to turn the <strong>START</strong> word into the <strong>GOAL</strong> word.</p>
     <div class="example-ladder">
       <div class="rung">
@@ -286,7 +286,7 @@
     <ul>
       <li>Every word along the way must be a real word.</li>
       <li>You can't reuse a word you've already used.</li>
-      <li>💡 Stuck? Use a hint — you get 3 per puzzle.</li>
+      <li>Stuck? Use a hint — you get 3 per puzzle.</li>
     </ul>
     <p class="modal-foot">One shared daily puzzle for everyone · unlimited random puzzles anytime.</p>
     <button class="btn-primary" id="howToPlayCloseBtn" style="width:100%">Let's play!</button>
@@ -295,7 +295,7 @@
 
 <div id="addToHomeModal" class="modal-overlay hidden">
   <div class="modal-panel">
-    <h2>📲 Get Reminders</h2>
+    <h2>Get Reminders</h2>
     <p>To get a daily reminder, add Word Ladder to your Home Screen. It only takes two taps:</p>
     <ol class="big-steps">
       <li id="addToHomeStep1"></li>
@@ -352,7 +352,7 @@
     return {
       step1: 'Tap the <strong>Share</strong> icon (a square with an arrow) at the <strong>bottom</strong> of the screen.',
       step2: 'Tap <strong>"Add to Home Screen"</strong>.',
-      tip: 'Don\'t see it in the list? Scroll to the very bottom and tap <strong>"Edit Actions..."</strong>, then tap the ➕ next to "Add to Home Screen" — then go back and tap it.',
+      tip: 'Don\'t see it in the list? Scroll to the very bottom and tap <strong>"Edit Actions..."</strong>, then tap the + icon next to "Add to Home Screen" — then go back and tap it.',
     };
   }
 
@@ -645,14 +645,14 @@
       const chainIdx = i + 1;
       if (hintedIndices.has(chainIdx)) return "🟦";
       return i < puzzle.optimal ? "🟩" : "🟨";
-    }).join("") || "✅";
+    }).join("") || "✓";
 
     const puzzleLabel = mode === "daily" ? "today's Word Ladder" : "a Word Ladder puzzle";
     const challenge = perfect
-      ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! 🪜 Think you can match it?`
+      ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} — perfect! Think you can match it?`
       : hintsUsed > 0
-        ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (used ${hintsUsed} hint${hintsUsed === 1 ? "" : "s"}) 🪜 Can you beat me without hints?`
-        : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) 🪜 Can you beat me?`;
+        ? `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (used ${hintsUsed} hint${hintsUsed === 1 ? "" : "s"}) Can you beat me without hints?`
+        : `I solved ${puzzleLabel} in ${moves} move${moves === 1 ? "" : "s"} (optimal: ${puzzle.optimal}) Can you beat me?`;
     const chainLine = `${puzzle.start.toUpperCase()} → ${puzzle.target.toUpperCase()}`;
     const shareUrl = shareUrlFor();
     currentShareText = `${challenge}\n${chainLine}\n${rungIcons}\n${shareUrl}`;
@@ -757,7 +757,7 @@
       // iOS Safari only exposes the Push API to home-screen installs, not regular tabs.
       if (isIOS() && !isStandalone()) {
         els.notifyBtn.classList.remove("hidden");
-        els.notifyBtn.textContent = "🔔 Add to Home Screen for reminders";
+        els.notifyBtn.textContent = "Add to Home Screen for reminders";
         els.notifyBtn.addEventListener("click", showAddToHomeScreenModal);
       }
       return;
@@ -826,7 +826,7 @@
   }
 
   function setNotifyBtnState(subscribed) {
-    els.notifyBtn.textContent = subscribed ? "🔕 Turn off daily reminder" : "🔔 Get a daily reminder";
+    els.notifyBtn.textContent = subscribed ? "Turn off daily reminder" : "Get a daily reminder";
   }
 
   // ---------- Install prompt ----------
@@ -839,7 +839,7 @@
       e.preventDefault();
       deferredInstallPrompt = e;
       if (localStorage.getItem("wordladder:dismissedInstall")) return;
-      els.installBannerText.textContent = "📲 Install Word Ladder as an app for the full experience.";
+      els.installBannerText.textContent = "Install Word Ladder as an app for the full experience.";
       els.installBtn.classList.remove("hidden");
       els.installBanner.classList.remove("hidden");
     });
@@ -867,7 +867,7 @@
     els.addToHomeStep1.innerHTML = instr.step1;
     els.addToHomeStep2.innerHTML = instr.step2;
     if (instr.tip) {
-      els.addToHomeTip.innerHTML = "💡 " + instr.tip;
+      els.addToHomeTip.innerHTML = instr.tip;
       els.addToHomeTip.classList.remove("hidden");
     } else {
       els.addToHomeTip.classList.add("hidden");
@@ -917,8 +917,8 @@
 
     try {
       await navigator.clipboard.writeText(text);
-      els.shareBtn.textContent = "✅ Copied!";
-      setTimeout(() => els.shareBtn.textContent = "🔗 Share Result", 1500);
+      els.shareBtn.textContent = "Copied!";
+      setTimeout(() => els.shareBtn.textContent = "Share Result", 1500);
     } catch {
       alert(text);
     }
