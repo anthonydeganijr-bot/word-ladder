@@ -32,6 +32,7 @@
     --tile-target: #eef0ff;
     --good: #3aa76d;
     --bad: #e0554a;
+    --warn: #b5750f;
     --shadow: 0 8px 24px rgba(0,0,0,0.08);
   }
   @media (prefers-color-scheme: dark) {
@@ -47,6 +48,7 @@
       --tile-target: #2a2c3c;
       --good: #4fc98a;
       --bad: #ef6d63;
+      --warn: #e0a84f;
       --shadow: 0 8px 24px rgba(0,0,0,0.35);
     }
   }
@@ -94,6 +96,7 @@
     background: var(--panel); border: 1px solid var(--tile-border);
     border-radius: 999px; padding: 4px 12px; box-shadow: var(--shadow);
   }
+  .streak-nudge { margin: 6px 0 0; font-size: 12px; color: var(--warn); text-align: center; }
   .panel {
     background: var(--panel);
     border-radius: 20px;
@@ -217,6 +220,7 @@
       <span id="todayLabel"></span>
       <span class="streak"><span id="streakCount">0</span> day streak</span>
     </div>
+    <p id="streakNudge" class="streak-nudge hidden"></p>
   </header>
 
   <div class="panel">
@@ -484,6 +488,7 @@
   const els = {
     todayLabel: document.getElementById("todayLabel"),
     streakCount: document.getElementById("streakCount"),
+    streakNudge: document.getElementById("streakNudge"),
     targetTiles: document.getElementById("targetTiles"),
     ladder: document.getElementById("ladder"),
     playArea: document.getElementById("playArea"),
@@ -566,19 +571,40 @@
     localStorage.setItem("wordladder:" + key, JSON.stringify(data));
   }
 
+  function yesterdayKey() {
+    const y = new Date(Date.now() - 86400000);
+    return y.getFullYear() + "-" + String(y.getMonth() + 1).padStart(2, "0") + "-" + String(y.getDate()).padStart(2, "0");
+  }
+  // Parsing "YYYY-MM-DD" via `new Date(key)` reads it as UTC midnight, which can
+  // display as the wrong day in negative-UTC-offset timezones -- build the date from
+  // its local components instead.
+  function formatShortDate(key) {
+    const [y, m, d] = key.split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
   function updateStreakDisplay() {
     const streak = parseInt(localStorage.getItem("wordladder:streak") || "0", 10);
     els.streakCount.textContent = streak;
+    // Only nudge for the genuinely recoverable case -- last win was exactly
+    // yesterday, so playing today keeps the streak going. If the gap is bigger
+    // than that the streak is already gone (the next win will reset it to 1
+    // regardless), so "play today to keep your streak" would be misleading.
+    const lastWin = localStorage.getItem("wordladder:lastWinDate");
+    const today = todayKey();
+    if (streak > 0 && lastWin !== today && lastWin === yesterdayKey()) {
+      els.streakNudge.textContent = `You last played ${formatShortDate(lastWin)} — play today to keep your streak`;
+      els.streakNudge.classList.remove("hidden");
+    } else {
+      els.streakNudge.classList.add("hidden");
+    }
   }
 
   function bumpStreakOnWin() {
     const key = todayKey();
     const lastWin = localStorage.getItem("wordladder:lastWinDate");
     if (lastWin === key) return; // already counted today
-    const yesterday = new Date(Date.now() - 86400000);
-    const yKey = yesterday.getFullYear() + "-" + String(yesterday.getMonth() + 1).padStart(2, "0") + "-" + String(yesterday.getDate()).padStart(2, "0");
     let streak = parseInt(localStorage.getItem("wordladder:streak") || "0", 10);
-    streak = (lastWin === yKey) ? streak + 1 : 1;
+    streak = (lastWin === yesterdayKey()) ? streak + 1 : 1;
     localStorage.setItem("wordladder:streak", String(streak));
     localStorage.setItem("wordladder:lastWinDate", key);
     updateStreakDisplay();
