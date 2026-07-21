@@ -660,7 +660,11 @@
     els.shareChain.textContent = chainLine;
     els.shareGrid.textContent = rungIcons;
     els.shareLink.textContent = shareUrl;
-    if (!alreadySolved) bumpStreakOnWin();
+    // Only the actual daily puzzle should count toward the streak -- this used to fire
+    // for random puzzles too, since it only checked whether the win screen had already
+    // been shown once today, not which puzzle was actually solved. That let a streak
+    // stay "alive" (or grow) purely from random plays without ever solving the daily.
+    if (!alreadySolved && mode === "daily") bumpStreakOnWin();
   }
 
   function submitWord() {
