@@ -583,16 +583,28 @@
     return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
   }
   function updateStreakDisplay() {
-    const streak = parseInt(localStorage.getItem("wordladder:streak") || "0", 10);
-    els.streakCount.textContent = streak;
-    // Only nudge for the genuinely recoverable case -- last win was exactly
-    // yesterday, so playing today keeps the streak going. If the gap is bigger
-    // than that the streak is already gone (the next win will reset it to 1
-    // regardless), so "play today to keep your streak" would be misleading.
+    // The stored streak number is only ever corrected at the moment of the NEXT
+    // win -- it doesn't self-correct just because time passes. So a streak that
+    // broke two days ago still reads as its old (stale) value here, with nothing
+    // indicating it's actually already dead. Recompute what's true right now
+    // instead of trusting the stored number at face value.
+    const storedStreak = parseInt(localStorage.getItem("wordladder:streak") || "0", 10);
     const lastWin = localStorage.getItem("wordladder:lastWinDate");
     const today = todayKey();
-    if (streak > 0 && lastWin !== today && lastWin === yesterdayKey()) {
-      els.streakNudge.textContent = `You last played ${formatShortDate(lastWin)} — play today to keep your streak`;
+    const yesterday = yesterdayKey();
+
+    let displayStreak = storedStreak;
+    let nudgeText = null;
+    if (lastWin === yesterday && storedStreak > 0) {
+      nudgeText = `You last played ${formatShortDate(lastWin)} — play today to keep your streak`;
+    } else if (lastWin && lastWin !== today && lastWin !== yesterday && storedStreak > 0) {
+      displayStreak = 0;
+      nudgeText = `Your streak ended — you last played ${formatShortDate(lastWin)}`;
+    }
+
+    els.streakCount.textContent = displayStreak;
+    if (nudgeText) {
+      els.streakNudge.textContent = nudgeText;
       els.streakNudge.classList.remove("hidden");
     } else {
       els.streakNudge.classList.add("hidden");
